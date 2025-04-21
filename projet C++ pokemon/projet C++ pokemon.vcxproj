@@ -127,7 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Attaque.cpp" />
     <ClCompile Include="projet C++ pokemon.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Attaque.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
