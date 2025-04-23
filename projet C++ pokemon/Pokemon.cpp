@@ -1,4 +1,4 @@
-#include "Animal.h"
+#include "Pokemon.h"
 Animal::Animal(string nom, int age) : nom(nom), age(age) {}
 
 void Animal::afficher() {
