@@ -1,18 +1,22 @@
 #pragma once
-#ifndef ANIMAL_H
-#define ANIMAL_H
+#ifndef POKEMON
+#define POKEMON
 
 #include <iostream>
 #include <string>
 using namespace std;
 
-class Animal {
+class Pokemon {
 protected:
     string nom;
-    int age;
+    vector<string> type;
+    int hp;
+    Attaque attaque;
+    int degat;
+    string faiblesse;
 
 public:
-    Animal(string nom, int age);
+    Pokemon(string Nom, vector<string> Type, int Hp, Attaque Attaque, int Degat, string Faiblesse);
     void afficher();
 };
 
