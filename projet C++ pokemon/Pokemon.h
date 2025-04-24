@@ -21,3 +21,7 @@ public:
 };
 
 #endif
+
+class Pokemon
+{
+};
