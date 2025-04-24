@@ -1,7 +1,9 @@
 #include <iostream>
+#include "Interface.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    Interface i;
+    i.Bienvenue();
 }
 
