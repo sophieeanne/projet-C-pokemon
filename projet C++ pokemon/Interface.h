@@ -2,37 +2,23 @@
 using namespace std;
 #include <string>
 #include <iostream>
+#include <vector>
+#include <map>
+#include <fstream>
+#include <sstream>
+#include "Pokemon.h"
+#include "Entraineur.h"
 class Interface
 {
 public :
+	string nomFichier;
+	//constructeur par défaut
 	Interface(){}
-	void SetUp() {
-		cout << "=== BIENVENUE DANS POKEMON ===" << endl;
-		cout << "1) Nouvelle partie" << endl;
-		cout << "2) Charger une partie" << endl;
-		cout << "3) Quitter" << endl;
-		int choix;
-		cin >> choix;
-		if (choix < 1 || choix>3) {
-			do {
-				cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 3" << endl;
-
-			} while (choix < 1 || choix>3);
-		}
-		switch (choix) {
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		default:
-			break;
-		}
-	}
-	//Créer un nouveau joueur
+	//constructeur
+	Interface(string NomFichier) : nomFichier(NomFichier) {}
 	void Bienvenue() {
 		cout << "Bienvenue *nom du joueur il faudra remplacer par le nom quand y'aura la classe entraineur*" << endl;
+		cout << "0) Ajouter un joueur" << endl;
 		cout << "1) Gerer mon equipe" << endl;
 		cout << "2) Combattre" << endl;
 		cout << "3) Mes statistiques" << endl;
@@ -40,13 +26,16 @@ public :
 		cout << "5) Sauvegarder et quitter" << endl;
 		int choix;
 		cin >> choix;
-		if (choix < 1 || choix>5) {
+		if (choix < 0 || choix>5) {
 			do {
 				cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 5" << endl;
 
-			} while (choix < 1 || choix>5);
+			} while (choix < 0 || choix>5);
 		}
 		switch (choix) {
+		case 0:
+			AjouterJoueur();
+			break;
 		case 1:
 			GererEquipe();
 			break;
@@ -63,6 +52,28 @@ public :
 		default :
 			break;
 		}
+	}
+
+	void AjouterJoueur() {
+		cout << "=== AJOUTER UN JOUEUR ===" << endl;
+		cout << "Veuillez entrer votre nom : ";
+		string nomJoueur;
+		cin >> nomJoueur;
+		cout << "Bienvenue " << nomJoueur << " !" << endl;
+		cout << "Saisissez le nom du pokemon que vous voulez ajouter : ";
+		string nomPokemon;
+		cin >> nomPokemon;
+		map<string, Pokemon> pokedex = chargerPokemonDepuisFichier(nomFichier);
+		if (pokedex.find(nomPokemon) != pokedex.end()) {
+			Pokemon poke = pokedex[nomPokemon];
+			Entraineur joueur(nomJoueur, {});
+			joueur.ajouterPokemon(poke);
+			cout << "Pokemon ajoute avec succes !" << endl;
+		}
+		else {
+			cout << "Pokemon introuvable dans le Pokedex." << endl;
+		}
+	
 	}
 
 	void GererEquipe() {
