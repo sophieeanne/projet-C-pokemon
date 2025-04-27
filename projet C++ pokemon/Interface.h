@@ -31,7 +31,6 @@ public :
 		}
 	}
 	//Créer un nouveau joueur
-	void 
 	void Bienvenue() {
 		cout << "Bienvenue *nom du joueur il faudra remplacer par le nom quand y'aura la classe entraineur*" << endl;
 		cout << "1) Gerer mon equipe" << endl;
