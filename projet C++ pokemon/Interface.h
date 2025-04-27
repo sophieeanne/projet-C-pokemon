@@ -6,6 +6,32 @@ class Interface
 {
 public :
 	Interface(){}
+	void SetUp() {
+		cout << "=== BIENVENUE DANS POKEMON ===" << endl;
+		cout << "1) Nouvelle partie" << endl;
+		cout << "2) Charger une partie" << endl;
+		cout << "3) Quitter" << endl;
+		int choix;
+		cin >> choix;
+		if (choix < 1 || choix>3) {
+			do {
+				cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 3" << endl;
+
+			} while (choix < 1 || choix>3);
+		}
+		switch (choix) {
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		default:
+			break;
+		}
+	}
+	//Créer un nouveau joueur
+	void 
 	void Bienvenue() {
 		cout << "Bienvenue *nom du joueur il faudra remplacer par le nom quand y'aura la classe entraineur*" << endl;
 		cout << "1) Gerer mon equipe" << endl;
@@ -23,10 +49,13 @@ public :
 		}
 		switch (choix) {
 		case 1:
+			GererEquipe();
 			break;
 		case 2:
+			Combattre();
 			break;
 		case 3 :
+			Statistiques();
 			break;
 		case 4 :
 			break;
@@ -93,7 +122,8 @@ public :
 		default:
 			break;
 		}
-	}
+	}	
+
 	void Statistiques() {
 		//modifier quand y'aura la classe Entraineur
 	}
