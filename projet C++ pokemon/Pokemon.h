@@ -98,6 +98,18 @@ public:
 		return pokedex;
 	}
 
+	void afficherPokemon() {
+		cout << "=== POKEMON ===" << endl;
+		cout << "Nom : " << nom << endl;
+		cout << "Type 1 : " << type1 << endl;
+		cout << "Type 2 : " << type2 << endl;
+		cout << "HP : " << hp << endl;
+		cout << "Attaques : " << endl;
+		for (const auto& attaque : attaques) {
+			cout << "- " << attaque.first << ": " << attaque.second << endl;
+		}
+		cout << "Faiblesse : " << faiblesse << endl;
+	}
 };
 
 #endif
