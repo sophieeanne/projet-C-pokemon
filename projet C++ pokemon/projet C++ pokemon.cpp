@@ -41,7 +41,7 @@ void afficherPokedex(const map<string, Pokemon>& pokedex) {
 
 int main()
 {
-	map<string, Pokemon> pokedex = chargerPokemonDepuisFichier("pokedex.csv");
+	map<string, Pokemon> pokedex = chargerPokemonDepuisFichier("pokemon.csv");
 	afficherPokedex(pokedex);
 }
 
