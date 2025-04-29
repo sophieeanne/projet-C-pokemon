@@ -48,9 +48,9 @@ void afficherPokedex(const map<string, Pokemon>& pokedex) {
 int main()
 {
 	string pokemonFichier = "pokemon.csv";
-	string nomFichier = "file1.txt";
+	string nomFichier = "joueur.csv";
 	//ouvrir le fichier en mode lecture et écriture
-	fstream myfile("file1.txt", ios::in | ios::out | ios::app);
+	fstream myfile(nomFichier, ios::in | ios::out | ios::app);
 	if (!myfile.is_open())
 	{
 		cout << "Error in opening the file" << endl;
@@ -58,60 +58,74 @@ int main()
 	}
 	map<string, Pokemon> pokedex = chargerPokemonDepuisFichier(pokemonFichier);
 	Interface interface(nomFichier, pokemonFichier, pokedex);
-	cout << "Bienvenue" << endl;
-	cout << "1) Ajouter un joueur" << endl;
-	cout << "2) Charger un joueur" << endl;
-	cout << "3) Gerer mon equipe" << endl;
-	cout << "4) Combattre" << endl;
-	cout << "5) Mes statistiques" << endl;
-	cout << "6) Sauvegarder et quitter" << endl;
-	int choix;
-	cin >> choix;
-	if (choix < 0 || choix>6) {
-		do {
-			cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 5" << endl;
+	
+    int choix = 0;
+    while (true) {
+        cout << "=== MENU ===" << endl;
+        cout << "1) Ajouter un joueur" << endl;
+        cout << "2) Charger un joueur" << endl;
+        cout << "3) Gerer mon equipe" << endl;
+        cout << "4) Combattre" << endl;
+        cout << "5) Mes statistiques" << endl;
+        cout << "6) Sauvegarder et quitter" << endl;
+        cout << "Votre choix : ";
+        cin >> choix;
 
-		} while (choix < 0 || choix>6);
-	}
-	switch (choix) {
-		case 1:
-			interface.creerNouveauJoueur(pokedex, nomFichier);
-			break;
-		case 2:
-		{
-			vector<Joueur> joueurs = interface.chargerJoueursDepuisFichier(nomFichier, pokedex);
-			if (joueurs.empty()) {
-				cout << "Aucun joueur à charger." << endl;
-			}
-			else {
-				cout << "Sélectionner le joueur à charger : " << endl;
-				for (int i = 0; i < joueurs.size(); ++i) {
-					cout << i + 1 << ") " << joueurs[i].getNom() << endl;
-				}
-				int joueurChoisi;
-				cin >> joueurChoisi;
-				if (joueurChoisi >= 1 && joueurChoisi <= joueurs.size()) {
-					interface.joueurActif = make_unique<Joueur>(joueurs[joueurChoisi - 1]);
-					cout << "Joueur " << interface.joueurActif->getNom() << " chargé avec succès!" << endl;
-				}
-				else {
-					cout << "Choix invalide." << endl;
-				}
-			}
-			break;
-		}
-		case 3:
-			break;
-		case 4:
-			interface.Statistiques();
-			break;
-		case 5:
-			break;
-		case 6:
-			break;
-		default:
-			break;
-	}
+        while (choix < 1 || choix > 6) {
+            cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 6." << endl;
+            cin >> choix;
+        }
+
+        switch (choix) {
+        case 1:
+            interface.joueurActif = make_unique<Joueur>(
+                Interface::creerNouveauJoueur(pokedex, nomFichier)
+            );
+            break;
+        case 2: {
+            vector<Joueur> joueurs = interface.chargerJoueursDepuisFichier(nomFichier, pokedex);
+            if (joueurs.empty()) {
+                cout << "Aucun joueur à charger." << endl;
+            }
+            else {
+                cout << "Sélectionner le joueur à charger : " << endl;
+                for (int i = 0; i < joueurs.size(); ++i) {
+                    cout << i + 1 << ") " << joueurs[i].getNom() << endl;
+                }
+                int joueurChoisi;
+                cin >> joueurChoisi;
+                if (joueurChoisi >= 1 && joueurChoisi <= joueurs.size()) {
+                    interface.joueurActif = make_unique<Joueur>(joueurs[joueurChoisi - 1]);
+                    cout << "Joueur " << interface.joueurActif->getNom() << " chargé avec succès!" << endl;
+                }
+                else {
+                    cout << "Choix invalide." << endl;
+                }
+            }
+            break;
+        }
+        case 3:
+            if (interface.joueurActif) {
+               
+            }
+            else {
+                cout << "Aucun joueur actif. Veuillez en charger ou en créer un." << endl;
+            }
+            break;
+        case 4:
+            interface.Combattre(); // Ajoute la vérification de joueur actif si nécessaire
+            break;
+        case 5:
+            interface.Statistiques();
+            break;
+        case 6:
+            cout << "Sauvegarde terminée. À bientôt !" << endl;
+            return 0;
+        }
+
+        cout << "\n--- Retour au menu principal ---\n" << endl;
+    }
+
 	
 }
 

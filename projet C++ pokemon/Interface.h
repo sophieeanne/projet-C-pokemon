@@ -28,12 +28,9 @@ public :
 		cin >> nom;
 
 		Joueur nouveau(nom, {}, 0, 0, 0);
-
-		int nb;
-		cout << "Combien de Pokémon voulez-vous ajouter (max 6) ? ";
-		cin >> nb;
-
-		for (int i = 0; i < nb; ++i) {
+		
+		cout << "Initialisation de l'équipe de 6 Pokémon :\n";
+		for (int i = 0; i < 6; ++i) {
 			string nomPoke;
 			cout << "Nom du Pokémon #" << i + 1 << " : ";
 			cin >> nomPoke;
@@ -44,22 +41,31 @@ public :
 	}
 	
 	static void enregistrerJoueurDansFichier(Joueur& joueur, const string& nomFichier) {
-		ofstream outFile(nomFichier, ios::app); // ajouter à la fin
+		ofstream outFile(nomFichier, ios::app);
 		if (!outFile) {
 			cerr << "Erreur d'ouverture du fichier " << nomFichier << endl;
 			return;
 		}
-		outFile << joueur.getNom() << ";"
-			<< joueur.getBadges() << ";"
-			<< joueur.getCombatsGagnes() << ";"
-			<< joueur.getCombatsPerdus() << ";";
 
-		for (int i = 0; i < joueur.getEquipe().size(); ++i) {
-			outFile << joueur.getEquipe()[i].getNom();
-			if (i != joueur.getEquipe().size() - 1) outFile << ",";
+		outFile << joueur.getNom();
+
+		// Ajouter les noms des Pokémon (jusqu’à 6)
+		const auto& equipe = joueur.getEquipe();
+		for (int i = 0; i < 6; ++i) {
+			if (i < equipe.size()) {
+				outFile << "," << equipe[i].getNom();
+			}
+			else {
+				outFile << ","; // case vide si pas de Pokémon
+			}
 		}
 
-		outFile << endl;
+		// Ajouter ensuite les nouveaux attributs
+		outFile << "," << joueur.getBadges()
+			<< "," << joueur.getCombatsGagnes()
+			<< "," << joueur.getCombatsPerdus()
+			<< endl;
+
 		outFile.close();
 	}
 
@@ -75,26 +81,35 @@ public :
 		string ligne;
 		while (getline(inFile, ligne)) {
 			stringstream ss(ligne);
-			string nom, badgesStr, gagnésStr, perdusStr, listePoke;
+			string champ;
+			vector<string> champs;
 
-			getline(ss, nom, ';');
-			getline(ss, badgesStr, ';');
-			getline(ss, gagnésStr, ';');
-			getline(ss, perdusStr, ';');
-			getline(ss, listePoke, ';');
+			// Lire tous les champs de la ligne
+			while (getline(ss, champ, ',')) {
+				champs.push_back(champ);
+			}
 
-			int badges = stoi(badgesStr);
-			int gagnes = stoi(gagnésStr);
-			int perdus = stoi(perdusStr);
+			if (champs.size() < 1) continue;
 
+			string nom = champs[0];
 			vector<Pokemon> equipe;
-			stringstream ssPoke(listePoke);
-			string nomPoke;
-			while (getline(ssPoke, nomPoke, ',')) {
-				auto it = pokedex.find(nomPoke);
-				if (it != pokedex.end()) {
-					equipe.push_back(it->second);
+
+			// Les Pokémon vont des index 1 à 6 (inclus si présents)
+			for (size_t i = 1; i <= 6 && i < champs.size(); ++i) {
+				if (!champs[i].empty()) {
+					auto it = pokedex.find(champs[i]);
+					if (it != pokedex.end()) {
+						equipe.push_back(it->second);
+					}
 				}
+			}
+
+			// Badges, Gagnes, Perdus si présents
+			int badges = 0, gagnes = 0, perdus = 0;
+			if (champs.size() >= 10) {
+				badges = stoi(champs[7]);
+				gagnes = stoi(champs[8]);
+				perdus = stoi(champs[9]);
 			}
 
 			Joueur joueur(nom, equipe, badges, gagnes, perdus);
@@ -104,10 +119,6 @@ public :
 		inFile.close();
 		return joueurs;
 	}
-
-
-
-
 
 
 	void GererEquipe() {
@@ -129,8 +140,7 @@ public :
 		}
 		switch (choix) {
 		case 1:
-			
-
+			joueurActif->afficherEquipe();
 			break;
 		case 2:
 			break;
