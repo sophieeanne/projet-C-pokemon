@@ -24,7 +24,7 @@ public:
 	Pokemon(string Nom, string t1, string t2, int Hp, string nomAttaque, int Degat) : nom(Nom), type1(t1), type2(t2), hp(Hp){
 		attaques[nomAttaque] = Degat;
 	}
-	~Pokemon() {} // Destructeur
+	//~Pokemon() {} // Destructeur
 
 	//setters
 	void setNom(string Nom) { nom = Nom; }
