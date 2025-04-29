@@ -43,7 +43,10 @@ public:
 		return attaques;
 	}	
 	//méthodes
-
+	virtual void attaquer(Pokemon& cible) = 0;
+	virtual int calculerDegats(Pokemon& cible) = 0;
+	void recevoirDegats(int degats) { hp = hp - degats; }
+	virtual ~Pokemon() = default;
 };
 
 #endif

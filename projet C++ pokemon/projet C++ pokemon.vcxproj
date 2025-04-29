@@ -130,12 +130,18 @@
     <ClCompile Include="Entraineur.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Pokemon.cpp" />
+    <ClCompile Include="PokemonEau.cpp" />
+    <ClCompile Include="PokemonElectrik.cpp" />
+    <ClCompile Include="PokemonFeu.cpp" />
     <ClCompile Include="projet C++ pokemon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entraineur.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="Pokemon.h" />
+    <ClInclude Include="PokemonEau.h" />
+    <ClInclude Include="PokemonElectrik.h" />
+    <ClInclude Include="PokemonFeu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
