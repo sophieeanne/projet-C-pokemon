@@ -11,77 +11,102 @@ using namespace std;
 class Interface
 {
 public :
-	string nomFichier;
+	string fichier;
+	map<string, Pokemon> pokedex;
+	string pokemonFichier = "pokemon.csv";
 	//constructeur par défaut
 	Interface(){}
 	//constructeur
-	Interface(string NomFichier) : nomFichier(NomFichier) {}
-	void Bienvenue() {
-		cout << "Bienvenue *nom du joueur il faudra remplacer par le nom quand y'aura la classe entraineur*" << endl;
-		cout << "0) Ajouter un joueur" << endl;
-		cout << "1) Gerer mon equipe" << endl;
-		cout << "2) Combattre" << endl;
-		cout << "3) Mes statistiques" << endl;
-		cout << "4) Interagir" << endl;
-		cout << "5) Sauvegarder et quitter" << endl;
-		int choix;
-		cin >> choix;
-		if (choix < 0 || choix>5) {
-			do {
-				cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 5" << endl;
+	Interface(string NomFichier, string pf, map<string, Pokemon> p) : fichier(NomFichier), pokemonFichier(pf), pokedex(p) {}
 
-			} while (choix < 0 || choix>5);
+	static Joueur creerNouveauJoueur(const map<string, Pokemon>& pokedex, const string& fichier) {
+		string nom;
+		cout << "Entrez le nom du joueur : ";
+		cin >> nom;
+
+		Joueur nouveau(nom, {}, 0, 0, 0);
+
+		int nb;
+		cout << "Combien de Pokémon voulez-vous ajouter (max 6) ? ";
+		cin >> nb;
+
+		for (int i = 0; i < nb; ++i) {
+			string nomPoke;
+			cout << "Nom du Pokémon #" << i + 1 << " : ";
+			cin >> nomPoke;
+			nouveau.ajouterPokemon(nomPoke, pokedex);
 		}
-		switch (choix) {
-		case 0:
-			AjouterJoueur();
-			break;
-		case 1:
-			GererEquipe();
-			break;
-		case 2:
-			Combattre();
-			break;
-		case 3 :
-			Statistiques();
-			break;
-		case 4 :
-			break;
-		case 5 :
-			break;
-		default :
-			break;
-		}
+		Interface::enregistrerJoueurDansFichier(nouveau, fichier); 
+		return nouveau;
 	}
-
-	void AjouterJoueur() {
-		cout << "=== AJOUTER UN JOUEUR ===" << endl;
-		cout << "Veuillez entrer votre nom : ";
-		string nomJoueur;
-		cin >> nomJoueur;
-		cout << "Bienvenue " << nomJoueur << " !" << endl;
-		cout << "Saisissez le nom du pokemon que vous voulez ajouter : ";
-		string nomPokemon;
-		cin >> nomPokemon;
-		map<string, Pokemon> pokedex = chargerPokemonDepuisFichier(nomFichier);
-		if (pokedex.find(nomPokemon) != pokedex.end()) {
-			Pokemon poke = pokedex[nomPokemon];
-			Entraineur joueur(nomJoueur, {});
-			joueur.ajouterPokemon(poke);
-			cout << "Pokemon ajoute avec succes !" << endl;
-		}
-		else {
-			cout << "Pokemon introuvable dans le Pokedex." << endl;
-		}
 	
+	static void enregistrerJoueurDansFichier(Joueur& joueur, const string& nomFichier) {
+		ofstream outFile(nomFichier, ios::app); // ajouter à la fin
+		if (!outFile) {
+			cerr << "Erreur d'ouverture du fichier " << nomFichier << endl;
+			return;
+		}
+		outFile << joueur.getNom() << ";"
+			<< joueur.getBadges() << ";"
+			<< joueur.getCombatsGagnes() << ";"
+			<< joueur.getCombatsPerdus() << ";";
+
+		for (int i = 0; i < joueur.getEquipe().size(); ++i) {
+			outFile << joueur.getEquipe()[i].getNom();
+			if (i != joueur.getEquipe().size() - 1) outFile << ",";
+		}
+
+		outFile << endl;
+		outFile.close();
 	}
 
-	void GererEquipe() {
+	static vector<Joueur> chargerJoueursDepuisFichier(const string& nomFichier, const map<string, Pokemon>& pokedex) {
+		vector<Joueur> joueurs;
+		ifstream inFile(nomFichier);
+
+		if (!inFile) {
+			cerr << "Erreur de lecture du fichier " << nomFichier << endl;
+			return joueurs;
+		}
+
+		string ligne;
+		while (getline(inFile, ligne)) {
+			stringstream ss(ligne);
+			string nom, badgesStr, gagnésStr, perdusStr, listePoke;
+
+			getline(ss, nom, ';');
+			getline(ss, badgesStr, ';');
+			getline(ss, gagnésStr, ';');
+			getline(ss, perdusStr, ';');
+			getline(ss, listePoke, ';');
+
+			int badges = stoi(badgesStr);
+			int gagnes = stoi(gagnésStr);
+			int perdus = stoi(perdusStr);
+
+			vector<Pokemon> equipe;
+			stringstream ssPoke(listePoke);
+			string nomPoke;
+			while (getline(ssPoke, nomPoke, ',')) {
+				auto it = pokedex.find(nomPoke);
+				if (it != pokedex.end()) {
+					equipe.push_back(it->second);
+				}
+			}
+
+			Joueur joueur(nom, equipe, badges, gagnes, perdus);
+			joueurs.push_back(joueur);
+		}
+
+		inFile.close();
+		return joueurs;
+	}
+
+	void GererEquipe(Joueur& joueur) {
 		cout << "=== GERER MON EQUIPE ===" << endl;
 		cout << "1) Afficher mes pokemons" << endl;
-		cout << "2) Changer l'ordre" << endl;
-		cout << "3) Soigner l'equipe" << endl;
-		cout << "4) Retour" << endl;
+		cout << "2) Soigner l'equipe" << endl;
+		cout << "3) Retour" << endl;
 		int choix;
 		cin >> choix;
 		if (choix < 1 || choix>5) {
@@ -92,13 +117,14 @@ public :
 		}
 		switch (choix) {
 		case 1:
+			
+
 			break;
 		case 2:
 			break;
 		case 3:
 			break;
 		case 4:
-			Bienvenue();
 			break;
 		default:
 			break;
@@ -127,7 +153,6 @@ public :
 		case 3:
 			break;
 		case 4:
-			Bienvenue();
 			break;
 		default:
 			break;

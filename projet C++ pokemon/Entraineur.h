@@ -26,23 +26,33 @@ public :
 	string getNom() {
 		return nom;
 	}
+	vector<Pokemon> getEquipe() {
+		return equipe;
+	}
 
 	//méthodes
-	void ajouterPokemon(Pokemon poke) {
-		if (poke.getNom() == "") {
-			cout << "Le pokemon n'existe pas !" << endl;
+	void ajouterPokemon(const string& nomPokemon, const map<string, Pokemon>& pokedex) {
+		//vérifier si le Pokémon existe dans le Pokédex
+		auto it = pokedex.find(nomPokemon);
+		if (it == pokedex.end()) {
+			cout << "Le Pokémon '" << nomPokemon << "' n'existe pas dans le Pokédex !" << endl;
 			return;
 		}
+		//vérifier si l'équipe est pleine
 		if (equipePleine()) {
+			cout << "L'équipe est déjà complète !" << endl;
 			return;
 		}
-		for (int i = 0; i < equipe.size(); i++) {
-			if (equipe[i].getNom() == poke.getNom()) {
-				cout << "Le pokemon est déjà dans l'équipe !" << endl;
+		//vérifier si le Pokémon est déjà dans l'équipe
+		for (const auto& p : equipe) {
+			if (p.getNom() == nomPokemon) {
+				cout << "Le Pokémon est déjà dans l'équipe !" << endl;
 				return;
 			}
 		}
-		equipe.push_back(poke);
+		//ajouter le Pokémon à l'équipe
+		equipe.push_back(it->second);
+		cout << nomPokemon << " a été ajouté à l'équipe !" << endl;
 	}
 
 	void afficherEquipe() {
@@ -54,7 +64,6 @@ public :
 
 	bool equipePleine() {
 		if (equipe.size() >= 6) {
-			cout << "Votre equipe est pleine !" << endl;
 			return true;
 		}
 		return false;

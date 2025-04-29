@@ -47,7 +47,53 @@ void afficherPokedex(const map<string, Pokemon>& pokedex) {
 
 int main()
 {
-	map<string, Pokemon> pokedex = chargerPokemonDepuisFichier("pokemon.csv");
+	string pokemonFichier = "pokemon.csv";
+	string nomFichier = "file1.txt";
+	//ouvrir le fichier en mode lecture et écriture
+	fstream myfile("file1.txt", ios::in | ios::out | ios::app);
+	if (!myfile.is_open())
+	{
+		cout << "Error in opening the file" << endl;
+		return 1;
+	}
+	map<string, Pokemon> pokedex = chargerPokemonDepuisFichier(pokemonFichier);
+	Interface interface(nomFichier, pokemonFichier, pokedex);
+	cout << "Bienvenue" << endl;
+	cout << "1) Ajouter un joueur" << endl;
+	cout << "2) Charger un joueur" << endl;
+	cout << "2) Gerer mon equipe" << endl;
+	cout << "3) Combattre" << endl;
+	cout << "4) Mes statistiques" << endl;
+	cout << "5) Interagir" << endl;
+	cout << "6) Sauvegarder et quitter" << endl;
+	int choix;
+	cin >> choix;
+	if (choix < 0 || choix>6) {
+		do {
+			cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 5" << endl;
+
+		} while (choix < 0 || choix>6);
+	}
+	switch (choix) {
+	case 0:
+		interface.creerNouveauJoueur(pokedex, nomFichier);
+		break;
+	case 1:
+		interface.chargerJoueursDepuisFichier(nomFichier, pokedex);
+		break;
+	case 2:
+
+		break;
+	case 3:
+		interface.Statistiques();
+		break;
+	case 4:
+		break;
+	case 5:
+		break;
+	default:
+		break;
+	}
 	
 }
 
