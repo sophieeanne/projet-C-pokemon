@@ -45,8 +45,18 @@ public:
 	//méthodes
 	virtual void attaquer(Pokemon& cible) = 0;
 	virtual int calculerDegats(Pokemon& cible) = 0;
-	void recevoirDegats(int degats) { hp = hp - degats; }
 	virtual ~Pokemon() = default;
+	void recevoirDegats(int degats) { hp = hp - degats; }
+	void afficherInfos() {
+		cout << "Nom : " << nom << endl;
+		cout << "Type : " << type1 << ", " << type2 << endl;
+		cout << "Hp : " << hp << endl;
+		cout << "Attaques : " << endl;
+		for (const auto& attaque : attaques) {
+			cout << "- " << attaque.first << " : " << attaque.second << " puissance" << endl;
+		}
+		cout << "Faiblesse : " << faiblesse << endl;
+	}
 };
 
 #endif
