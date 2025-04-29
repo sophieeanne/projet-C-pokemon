@@ -14,10 +14,13 @@ public :
 	string fichier;
 	map<string, Pokemon> pokedex;
 	string pokemonFichier = "pokemon.csv";
+	unique_ptr<Entraineur> joueurActif;
+
 	//constructeur par défaut
-	Interface(){}
+	Interface() : joueurActif(nullptr) {}
 	//constructeur
-	Interface(string NomFichier, string pf, map<string, Pokemon> p) : fichier(NomFichier), pokemonFichier(pf), pokedex(p) {}
+	Interface(string NomFichier, string pf, map<string, Pokemon> p) : fichier(NomFichier), pokemonFichier(pf), pokedex(p), joueurActif(nullptr) {
+	}
 
 	static Joueur creerNouveauJoueur(const map<string, Pokemon>& pokedex, const string& fichier) {
 		string nom;
@@ -102,7 +105,16 @@ public :
 		return joueurs;
 	}
 
-	void GererEquipe(Joueur& joueur) {
+
+
+
+
+
+	void GererEquipe() {
+		if (!joueurActif) {
+			cout << "Aucun joueur actif ! Veuillez démarrer un jeu." << endl;
+			return;
+		}
 		cout << "=== GERER MON EQUIPE ===" << endl;
 		cout << "1) Afficher mes pokemons" << endl;
 		cout << "2) Soigner l'equipe" << endl;
