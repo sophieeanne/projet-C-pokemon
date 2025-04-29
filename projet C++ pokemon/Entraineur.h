@@ -8,13 +8,13 @@ class Entraineur
 {
 protected : 
 	string nom;
-	vector<Pokemon> equipe;
+	vector<Pokemon*> equipe;
 public : 
 	//constructeur par défaut
 	Entraineur() : nom(""), equipe({}) {}
 
 	//constructeur
-	Entraineur(string Nom, vector<Pokemon> Equipe) : nom(Nom), equipe(Equipe) {} 
+	Entraineur(string Nom, vector<Pokemon*> Equipe) : nom(Nom), equipe(Equipe) {} 
 
 	//destructeur
 	~Entraineur() {}
@@ -26,12 +26,12 @@ public :
 	string getNom() {
 		return nom;
 	}
-	vector<Pokemon> getEquipe() {
+	vector<Pokemon*> getEquipe() {
 		return equipe;
 	}
 
 	//méthodes
-	void ajouterPokemon(const string& nomPokemon, const map<string, Pokemon>& pokedex) {
+	void ajouterPokemon(const string& nomPokemon, const map<string, Pokemon*>& pokedex) {
 		//vérifier si le Pokémon existe dans le Pokédex
 		auto it = pokedex.find(nomPokemon);
 		if (it == pokedex.end()) {
@@ -45,7 +45,7 @@ public :
 		}
 		//vérifier si le Pokémon est déjà dans l'équipe
 		for (const auto& p : equipe) {
-			if (p.getNom() == nomPokemon) {
+			if (p->getNom() == nomPokemon) {
 				cout << "Le Pokémon est déjà dans l'équipe !" << endl;
 				return;
 			}
@@ -58,7 +58,7 @@ public :
 	void afficherEquipe() {
 		cout << "=== MON EQUIPE ===" << endl;
 		for (int i = 0; i < equipe.size(); i++) {
-			cout << i + 1 << ") " << equipe[i].getNom() << endl;
+			cout << i + 1 << ") " << equipe[i]->getNom() << endl;
 		}
 	}
 
@@ -79,7 +79,7 @@ public:
 	//constructeur par défaut
 	Joueur() : Entraineur("", {}), badges(0), combatsGagnes(0), combatsPerdus(0) {} // Constructeur par défaut
 	//constructeur
-	Joueur(string Nom, vector<Pokemon> Equipe, int Badges, int CombatsGagnes, int CombatsPerdus) : Entraineur(Nom, Equipe), badges(Badges), combatsGagnes(CombatsGagnes), combatsPerdus(CombatsPerdus) {}
+	Joueur(string Nom, vector<Pokemon*> Equipe, int Badges, int CombatsGagnes, int CombatsPerdus) : Entraineur(Nom, Equipe), badges(Badges), combatsGagnes(CombatsGagnes), combatsPerdus(CombatsPerdus) {}
 
 	//setters
 	void setBadges(int Badges) {
@@ -128,7 +128,7 @@ public:
 	//constructeur par défaut
 	LeaderGym() : Entraineur("", {}), badgeGym(""), nomGym("") {} // Constructeur par défaut
 	//constructeur
-	LeaderGym(string Nom, vector<Pokemon> Equipe, string BadgeGym, string NomGym) : Entraineur(Nom, Equipe), badgeGym(BadgeGym), nomGym(NomGym) {}
+	LeaderGym(string Nom, vector<Pokemon*> Equipe, string BadgeGym, string NomGym) : Entraineur(Nom, Equipe), badgeGym(BadgeGym), nomGym(NomGym) {}
 	//destructeur
 	~LeaderGym() {}
 
@@ -161,7 +161,7 @@ public :
 	//constructeur par défaut
 	MaitrePokemon() : Entraineur("", {}) {} // Constructeur par défaut
 	//constructeur
-	MaitrePokemon(string Nom, vector<Pokemon> Equipe) : Entraineur(Nom, Equipe) {}
+	MaitrePokemon(string Nom, vector<Pokemon*> Equipe) : Entraineur(Nom, Equipe) {}
 	//destructeur
 	~MaitrePokemon() {}
 

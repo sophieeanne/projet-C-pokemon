@@ -12,17 +12,17 @@ class Interface
 {
 public :
 	string fichier;
-	map<string, Pokemon> pokedex;
+	map<string, Pokemon*> pokedex;
 	string pokemonFichier = "pokemon.csv";
 	unique_ptr<Entraineur> joueurActif;
 
 	//constructeur par défaut
 	Interface() : joueurActif(nullptr) {}
 	//constructeur
-	Interface(string NomFichier, string pf, map<string, Pokemon> p) : fichier(NomFichier), pokemonFichier(pf), pokedex(p), joueurActif(nullptr) {
+	Interface(string NomFichier, string pf, map<string, Pokemon*> p) : fichier(NomFichier), pokemonFichier(pf), pokedex(p), joueurActif(nullptr) {
 	}
 
-	static Joueur creerNouveauJoueur(const map<string, Pokemon>& pokedex, const string& fichier) {
+	static Joueur creerNouveauJoueur(const map<string, Pokemon*>& pokedex, const string& fichier) {
 		string nom;
 		cout << "Entrez le nom du joueur : ";
 		cin >> nom;
@@ -53,7 +53,7 @@ public :
 		const auto& equipe = joueur.getEquipe();
 		for (int i = 0; i < 6; ++i) {
 			if (i < equipe.size()) {
-				outFile << "," << equipe[i].getNom();
+				outFile << "," << equipe[i]->getNom();
 			}
 			else {
 				outFile << ","; // case vide si pas de Pokémon
@@ -69,7 +69,7 @@ public :
 		outFile.close();
 	}
 
-	static vector<Joueur> chargerJoueursDepuisFichier(const string& nomFichier, const map<string, Pokemon>& pokedex) {
+	static vector<Joueur> chargerJoueursDepuisFichier(const string& nomFichier, const map<string, Pokemon*>& pokedex) {
 		vector<Joueur> joueurs;
 		ifstream inFile(nomFichier);
 
@@ -92,14 +92,14 @@ public :
 			if (champs.size() < 1) continue;
 
 			string nom = champs[0];
-			vector<Pokemon> equipe;
+			vector<Pokemon*> equipe;  // Utiliser des pointeurs vers Pokémon
 
 			// Les Pokémon vont des index 1 à 6 (inclus si présents)
 			for (size_t i = 1; i <= 6 && i < champs.size(); ++i) {
 				if (!champs[i].empty()) {
 					auto it = pokedex.find(champs[i]);
 					if (it != pokedex.end()) {
-						equipe.push_back(it->second);
+						equipe.push_back(it->second);  // Ajouter un pointeur vers le Pokémon
 					}
 				}
 			}

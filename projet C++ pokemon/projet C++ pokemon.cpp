@@ -1,10 +1,13 @@
 #include <iostream>
 #include "Interface.h"
 #include "Pokemon.h"
+#include "PokemonFeu.h"
+#include "PokemonEau.h"
+#include "PokemonElectrik.h"
 
 // Charger les Pokémon depuis un fichier CSV
-map<string, Pokemon> chargerPokemonDepuisFichier(const string& fichierNom) {
-	map<string, Pokemon> pokedex;
+map<string, Pokemon*> chargerPokemonDepuisFichier(const string& fichierNom) {
+	map<string, Pokemon*> pokedex;
 	ifstream fichier(fichierNom);
 	if (!fichier) {
 		cerr << "Erreur lors de l'ouverture du fichier." << endl;
@@ -23,8 +26,19 @@ map<string, Pokemon> chargerPokemonDepuisFichier(const string& fichierNom) {
 		getline(ss, degatStr, ',');
 		int hp = stoi(hpStr);
 		int degat = stoi(degatStr);
-		Pokemon poke(nom, type1, type2, hp, nomAttaque, degat);
-		pokedex[nom] = poke;
+        
+
+        Pokemon* poke = nullptr;
+        if (type1 == "Feu") {
+			poke = new PokemonFeu(nom, hp, nomAttaque, degat, "Eau");
+		}
+        else if (type1 == "Eau") {
+			poke = new PokemonEau(nom, hp, nomAttaque, degat, "Electrik");
+        }
+		else if (type1 == "Electrik") {
+			poke = new PokemonElectrik(nom, hp, nomAttaque, degat, "Sol");
+        }
+        pokedex[nom] = poke;
 	}
 	return pokedex;
 }
@@ -56,7 +70,7 @@ int main()
 		cout << "Error in opening the file" << endl;
 		return 1;
 	}
-	map<string, Pokemon> pokedex = chargerPokemonDepuisFichier(pokemonFichier);
+	map<string, Pokemon*> pokedex = chargerPokemonDepuisFichier(pokemonFichier);
 	Interface interface(nomFichier, pokemonFichier, pokedex);
 	
     int choix = 0;
