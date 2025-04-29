@@ -7,6 +7,7 @@ public:
 	//Constructeur
 	PokemonEau(string Nom, int Hp, string nomAttaque, int Degat, string Faiblesse)
 		: Pokemon(Nom, "Eau" ,"", Hp, nomAttaque, Degat) {
+		setFaiblesse(Faiblesse);
 	}
 
 	//Méthodes virtuelles pures
@@ -21,6 +22,7 @@ public:
 		}
 		
 		cout << " et inflige " << degats << "degats ! " << endl;
+		cible.recevoirDegats(degats);
 	}
 
 	int calculerDegats(Pokemon& cible) override {
