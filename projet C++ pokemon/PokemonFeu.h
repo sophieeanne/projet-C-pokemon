@@ -13,7 +13,7 @@ public:
 	int calculerDegats(Pokemon& cible) override {
 		//Les attaques du type PokemonFeu sont pas efficaces contre le type PokemonEau (les dégats sont multipliés par 0.5)
 		float multiplicateur = 1.0f; //On suppose que le multiplicateur est neutre
-		if (type1 == "Eau" || type2 == "Eau") {
+		if (cible.getType1() == "Eau" || cible.getType2() == "Eau") {
 			multiplicateur = 0.5f;
 		}
 

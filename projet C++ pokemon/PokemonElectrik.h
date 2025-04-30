@@ -16,10 +16,10 @@ public:
 		//Les attaques du type PokemonElectrik sont pas efficaces contre le type PokemonElectrik (les dégats sont multipliés par 0.5)
 		float multiplicateur = 1.0f; //On suppose que le multiplicateur est neutre
 
-		if (type1 == "Eau" || type2 == "Eau") {
+		if (cible.getType1() == "Eau" || cible.getType2() == "Eau") {
 			multiplicateur = 2.0f;
 		}
-		else if (type2 == "Electrik") {
+		else if (cible.getType2() == "Electrik") {
 			multiplicateur = 0.5f;
 		}
 		//il y a un problème si un Pokemon est en même temps Eau et Electrik...

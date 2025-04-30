@@ -18,10 +18,10 @@ public:
 		float multiplicateur = 1.0f; //On suppose que le multiplicateur est neutre
 		string typeAttaque = attaques.begin()->first;
 
-		if (type1 == "Feu" || type2 == "Feu") {
+		if (cible.getType1() == "Feu" || cible.getType2() == "Feu") {
 			multiplicateur = 2.0f;
 		}
-		else if (type1 == "Eau" || type2 == "Eau") {
+		else if (cible.getType1() == "Eau" || cible.getType2() == "Eau") {
 			multiplicateur = 0.5f;
 		}
 		//il y a un problème si un Pokemon est en même temps Eau et Feu... (possible ?)
