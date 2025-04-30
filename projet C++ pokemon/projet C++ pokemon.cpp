@@ -44,18 +44,22 @@ map<string, Pokemon*> chargerPokemonDepuisFichier(const string& fichierNom) {
 }
 
 //afficher le pokedex (le résultat est long, c'est juste pour tester)
-void afficherPokedex(const map<string, Pokemon>& pokedex) {
-	cout << "=== POKEDEX ===" << endl;
-	for (const auto& pair : pokedex) {
-		const Pokemon& poke = pair.second;
-		cout << "Nom: " << poke.getNom() << ", Type1: " << poke.getType1() << ", Type2: " << poke.getType2() << ", HP: " << poke.getHp() << endl;
-		cout << "Attaques: ";
-		for (const auto& attaque : poke.getAttaques()) {
-			cout << attaque.first << " (Dégâts: " << attaque.second << "), ";
-		}
-		cout << endl;
+void afficherPokedex(const map<string, Pokemon*>& pokedex) {
+    cout << "=== POKEDEX ===" << endl;
+    for (const auto& pair : pokedex) {
+        if (!pair.second) {
+            //le pokemon n'est pas chargé
+            continue;
+        }
+        const Pokemon& poke = *pair.second;
+        cout << "Nom: " << poke.getNom() << ", Type1: " << poke.getType1() << ", Type2: " << poke.getType2() << ", HP: " << poke.getHp() << endl;
+        cout << "Attaques: ";
+        for (const auto& attaque : poke.getAttaques()) {
+            cout << attaque.first << " (Dégâts: " << attaque.second << "), ";
+        }
+        cout << endl;
 
-	}
+    }
 }
 
 
@@ -72,7 +76,7 @@ int main()
 	}
 	map<string, Pokemon*> pokedex = chargerPokemonDepuisFichier(pokemonFichier);
 	Interface interface(nomFichier, pokemonFichier, pokedex);
-	
+
     int choix = 0;
     while (true) {
         cout << "=== MENU ===" << endl;
