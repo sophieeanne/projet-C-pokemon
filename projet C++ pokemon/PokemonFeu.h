@@ -10,6 +10,16 @@ public:
 	}
 
 	//Méthodes virtuelles pures
+	int calculerDegats(Pokemon& cible) override {
+		//Les attaques du type PokemonFeu sont pas efficaces contre le type PokemonEau (les dégats sont multipliés par 0.5)
+		float multiplicateur = 1.0f; //On suppose que le multiplicateur est neutre
+		if (type1 == "Eau" || type2 == "Eau") {
+			multiplicateur = 0.5f;
+		}
+
+		return static_cast<int>(attaques.begin()->second * multiplicateur);
+	}
+
 	void attaquer(Pokemon& cible) override {
 		int degats = calculerDegats(cible);
 		cout << nom << " attaque " << cible.getNom() << " avec ";
@@ -24,15 +34,7 @@ public:
 		cible.recevoirDegats(degats);
 	}
 
-	int calculerDegats(Pokemon& cible) override {
-		//Les attaques du type PokemonFeu sont pas efficaces contre le type PokemonEau (les dégats sont multipliés par 0.5)
-		float multiplicateur = 1.0f; //On suppose que le multiplicateur est neutre
-			if (type1 == "Eau" || type2 == "Eau") {
-				multiplicateur = 0.5f;
-			}
-
-		return static_cast<int>(attaques.begin()->second * multiplicateur);
-	}
+	
 
 };
 
