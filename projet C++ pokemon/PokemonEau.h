@@ -43,6 +43,8 @@ public:
 		cible.recevoirDegats(degats);
 	}
 
+
+	~PokemonEau() override = default;
 	
 };
 

@@ -34,7 +34,7 @@ public:
 		cible.recevoirDegats(degats);
 	}
 
-	
+	~PokemonFeu() override = default;
 
 };
 

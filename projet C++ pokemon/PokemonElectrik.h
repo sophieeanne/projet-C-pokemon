@@ -41,6 +41,7 @@ public:
 		cible.recevoirDegats(degats);
 	}
 
+	~PokemonElectrik() override = default;
 	
 };
 
