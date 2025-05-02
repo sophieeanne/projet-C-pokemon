@@ -35,7 +35,7 @@ map<string, Pokemon*> chargerPokemonDepuisFichier(const string& fichierNom) {
         else if (type1 == "Eau") {
 			poke = new PokemonEau(nom, hp, nomAttaque, degat, "Electrik");
         }
-		else if (type1 == "Electrik") {
+		else if (type1 == "Ã‰lectrik") {
 			poke = new PokemonElectrik(nom, hp, nomAttaque, degat, "Sol");
         }
         pokedex[nom] = poke;
@@ -76,73 +76,74 @@ int main()
 	}
 	map<string, Pokemon*> pokedex = chargerPokemonDepuisFichier(pokemonFichier);
 	Interface interface(nomFichier, pokemonFichier, pokedex);
+	afficherPokedex(pokedex);
 
     int choix = 0;
-    while (true) {
-        cout << "=== MENU ===" << endl;
-        cout << "1) Ajouter un joueur" << endl;
-        cout << "2) Charger un joueur" << endl;
-        cout << "3) Gerer mon equipe" << endl;
-        cout << "4) Combattre" << endl;
-        cout << "5) Mes statistiques" << endl;
-        cout << "6) Sauvegarder et quitter" << endl;
-        cout << "Votre choix : ";
-        cin >> choix;
+    //while (true) {
+    //    cout << "=== MENU ===" << endl;
+    //    cout << "1) Ajouter un joueur" << endl;
+    //    cout << "2) Charger un joueur" << endl;
+    //    cout << "3) Gerer mon equipe" << endl;
+    //    cout << "4) Combattre" << endl;
+    //    cout << "5) Mes statistiques" << endl;
+    //    cout << "6) Sauvegarder et quitter" << endl;
+    //    cout << "Votre choix : ";
+    //    cin >> choix;
 
-        while (choix < 1 || choix > 6) {
-            cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 6." << endl;
-            cin >> choix;
-        }
+    //    while (choix < 1 || choix > 6) {
+    //        cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 6." << endl;
+    //        cin >> choix;
+    //    }
 
-        switch (choix) {
-        case 1:
-            interface.joueurActif = make_unique<Joueur>(
-                Interface::creerNouveauJoueur(pokedex, nomFichier)
-            );
-            break;
-        case 2: {
-            vector<Joueur> joueurs = interface.chargerJoueursDepuisFichier(nomFichier, pokedex);
-            if (joueurs.empty()) {
-                cout << "Aucun joueur à charger." << endl;
-            }
-            else {
-                cout << "Sélectionner le joueur à charger : " << endl;
-                for (int i = 0; i < joueurs.size(); ++i) {
-                    cout << i + 1 << ") " << joueurs[i].getNom() << endl;
-                }
-                int joueurChoisi;
-                cin >> joueurChoisi;
-                if (joueurChoisi >= 1 && joueurChoisi <= joueurs.size()) {
-                    interface.joueurActif = make_unique<Joueur>(joueurs[joueurChoisi - 1]);
-                    cout << "Joueur " << interface.joueurActif->getNom() << " chargé avec succès!" << endl;
-                }
-                else {
-                    cout << "Choix invalide." << endl;
-                }
-            }
-            break;
-        }
-        case 3:
-            if (interface.joueurActif) {
-               
-            }
-            else {
-                cout << "Aucun joueur actif. Veuillez en charger ou en créer un." << endl;
-            }
-            break;
-        case 4:
-            interface.Combattre(); // Ajoute la vérification de joueur actif si nécessaire
-            break;
-        case 5:
-            interface.Statistiques();
-            break;
-        case 6:
-            cout << "Sauvegarde terminée. À bientôt !" << endl;
-            return 0;
-        }
+    //    switch (choix) {
+    //    case 1:
+    //        interface.joueurActif = make_unique<Joueur>(
+    //            Interface::creerNouveauJoueur(pokedex, nomFichier)
+    //        );
+    //        break;
+    //    case 2: {
+    //        vector<Joueur> joueurs = interface.chargerJoueursDepuisFichier(nomFichier, pokedex);
+    //        if (joueurs.empty()) {
+    //            cout << "Aucun joueur à charger." << endl;
+    //        }
+    //        else {
+    //            cout << "Sélectionner le joueur à charger : " << endl;
+    //            for (int i = 0; i < joueurs.size(); ++i) {
+    //                cout << i + 1 << ") " << joueurs[i].getNom() << endl;
+    //            }
+    //            int joueurChoisi;
+    //            cin >> joueurChoisi;
+    //            if (joueurChoisi >= 1 && joueurChoisi <= joueurs.size()) {
+    //                interface.joueurActif = make_unique<Joueur>(joueurs[joueurChoisi - 1]);
+    //                cout << "Joueur " << interface.joueurActif->getNom() << " chargé avec succès!" << endl;
+    //            }
+    //            else {
+    //                cout << "Choix invalide." << endl;
+    //            }
+    //        }
+    //        break;
+    //    }
+    //    case 3:
+    //        if (interface.joueurActif) {
+    //           
+    //        }
+    //        else {
+    //            cout << "Aucun joueur actif. Veuillez en charger ou en créer un." << endl;
+    //        }
+    //        break;
+    //    case 4:
+    //        interface.Combattre(); // Ajoute la vérification de joueur actif si nécessaire
+    //        break;
+    //    case 5:
+    //        interface.Statistiques();
+    //        break;
+    //    case 6:
+    //        cout << "Sauvegarde terminée. À bientôt !" << endl;
+    //        return 0;
+    //    }
 
-        cout << "\n--- Retour au menu principal ---\n" << endl;
-    }
+    //    cout << "\n--- Retour au menu principal ---\n" << endl;
+    //}
 
 	
 }
