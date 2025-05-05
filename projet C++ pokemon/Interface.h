@@ -15,6 +15,7 @@ public :
 	map<string, Pokemon*> pokedex;
 	string pokemonFichier = "pokemon.csv";
 	unique_ptr<Entraineur> joueurActif;
+	string fichierJoueurs = "joueur.csv";
 
 	//constructeur par défaut
 	Interface() : joueurActif(nullptr) {}
@@ -179,7 +180,48 @@ public :
 		default:
 			break;
 		}
-	}	
+	}
+
+	void AffronterJoueur() {
+		cout << "Quel joueur voulez-vous affronter ?" << endl;
+		string nomAdversaire;
+		cin >> nomAdversaire;
+		//on cherche le nom de l'adversaire dans le fichier joueur
+		ifstream inFile(fichierJoueurs);
+		if (!inFile) {
+			cerr << "Erreur de lecture du fichier " << fichierJoueurs << endl;
+			return;
+		}
+		string ligne;
+		bool joueurTrouve = false;
+		while (getline(inFile, ligne)) {
+			stringstream ss(ligne);
+			string champ;
+			vector<string> champs;
+
+			// Lire tous les champs de la ligne
+			while (getline(ss, champ, ',')) {
+				champs.push_back(champ);
+			}
+
+			if (champs.size() < 1) continue;
+
+			if (champs[0] == nomAdversaire) {
+				joueurTrouve = true;
+				break;
+			}
+		}
+		inFile.close();
+		if (!joueurTrouve) {
+			cout << "Joueur non trouvé." << endl;
+			return;
+		}
+		cout << "Vous allez affronter " << nomAdversaire << endl;
+		//logique : le premier pokemon de leur liste s'attaquent, on update les hp, si un pokemon est KO, on passe au suivant
+		
+
+
+	}
 
 	void Statistiques() {
 		//modifier quand y'aura la classe Entraineur
