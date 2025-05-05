@@ -17,7 +17,7 @@ public :
 	Entraineur(string Nom, vector<Pokemon*> Equipe) : nom(Nom), equipe(Equipe) {} 
 
 	//destructeur
-	~Entraineur() {}
+	virtual ~Entraineur() = 0 {}
 	//setters
 	void setNom(string Nom) {
 		nom = Nom;
@@ -35,24 +35,24 @@ public :
 		//vérifier si le Pokémon existe dans le Pokédex
 		auto it = pokedex.find(nomPokemon);
 		if (it == pokedex.end()) {
-			cout << "Le Pokémon '" << nomPokemon << "' n'existe pas dans le Pokédex !" << endl;
+			cout << "Le Pokemon '" << nomPokemon << "' n'existe pas dans le Pokedex !" << endl;
 			return;
 		}
 		//vérifier si l'équipe est pleine
 		if (equipePleine()) {
-			cout << "L'équipe est déjà complète !" << endl;
+			cout << "L'equipe est deja complete !" << endl;
 			return;
 		}
 		//vérifier si le Pokémon est déjà dans l'équipe
 		for (const auto& p : equipe) {
 			if (p->getNom() == nomPokemon) {
-				cout << "Le Pokémon est déjà dans l'équipe !" << endl;
+				cout << "Le Pokemon est deja dans l'equipe !" << endl;
 				return;
 			}
 		}
 		//ajouter le Pokémon à l'équipe
 		equipe.push_back(it->second);
-		cout << nomPokemon << " a été ajouté à l'équipe !" << endl;
+		cout << nomPokemon << " a ete ajouté a l'equipe !" << endl;
 	}
 
 	void afficherEquipe() {
@@ -61,13 +61,29 @@ public :
 			cout << i + 1 << ") " << equipe[i]->getNom() << endl;
 		}
 	}
-
 	bool equipePleine() {
 		if (equipe.size() >= 6) {
 			return true;
 		}
 		return false;
 	}
+	Pokemon* getPokemonActif() {
+		for (auto& pokemon : equipe) {
+			if (!pokemon->estKo()) {
+				return pokemon;
+			}
+		}
+		return nullptr; // Tous les Pokémon sont KO
+	}
+	void soignerPokemon() {
+		for (auto& pokemon : equipe) {
+			if (pokemon->estKo()) {
+				pokemon->setHp(100); // Remettre les HP à 100
+				cout << pokemon->getNom() << " a ete soigne !" << endl;
+			}
+		}
+	}
+
 };
 class Joueur : public Entraineur
 {

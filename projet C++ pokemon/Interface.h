@@ -144,10 +144,9 @@ public :
 			joueurActif->afficherEquipe();
 			break;
 		case 2:
+			joueurActif->soignerPokemon();
 			break;
 		case 3:
-			break;
-		case 4:
 			break;
 		default:
 			break;
@@ -170,6 +169,7 @@ public :
 		}
 		switch (choix) {
 		case 1:
+			AffronterJoueur();
 			break;
 		case 2:
 			break;
@@ -217,8 +217,101 @@ public :
 			return;
 		}
 		cout << "Vous allez affronter " << nomAdversaire << endl;
-		//logique : le premier pokemon de leur liste s'attaquent, on update les hp, si un pokemon est KO, on passe au suivant
-		
+		Joueur adversaire;
+		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
+		if (joueur) {
+			joueur->ajouterCombatGagne();
+		}
+		vector<Joueur> tousLesJoueurs = chargerJoueursDepuisFichier(fichierJoueurs, pokedex);
+		for (auto j : tousLesJoueurs) {
+			if (j.getNom() == nomAdversaire) {
+				adversaire = j;
+				break;
+			}
+		}
+		int scoreJoueur = 0;
+		int scoreAdversaire = 0;
+
+		//On choisit au hasard qui commence (1 c'est le joueur, 2 c'est l'adversaire)
+		int quiCommence = rand() % 2 + 1;
+
+		//Boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
+		while (scoreJoueur < 3 && scoreAdversaire < 3) {
+			Pokemon* p1 = joueur->getPokemonActif();
+			Pokemon* p2 = adversaire.getPokemonActif();
+
+			if (p1 == nullptr || p2 == nullptr) {
+				cout << "Un des joueurs n'a plus de Pokemon utilisables." << endl;
+				break;
+			}
+
+			if (quiCommence == 1) {
+				//joueur attaque
+				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
+				p1->attaquer(*p2);
+				p2->recevoirDegats(p1->calculerDegats(*p2));
+
+				if (p2->estKo()) {
+					cout << p2->getNom() << " est KO !" << endl;
+					scoreJoueur++;
+					if (scoreJoueur == 3) break;
+				}
+
+				//adversaire attaque (si son Pokémon n’est pas KO)
+				if (!p2->estKo()) {
+					cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
+					p2->attaquer(*p1);
+					p1->recevoirDegats(p2->calculerDegats(*p1));
+
+					if (p1->estKo()) {
+						cout << p1->getNom() << " est KO !" << endl;
+						scoreAdversaire++;
+						if (scoreAdversaire == 3) break;
+					}
+				}
+			}
+			else {
+				//adversaire commence
+				cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
+				p2->attaquer(*p1);
+				p1->recevoirDegats(p2->calculerDegats(*p1));
+
+				if (p1->estKo()) {
+					cout << p1->getNom() << " est KO !" << endl;
+					scoreAdversaire++;
+					if (scoreAdversaire == 3) break;
+				}
+
+				//joueur attaque (si son Pokémon n’est pas KO)
+				if (!p1->estKo()) {
+					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
+					p1->attaquer(*p2);
+					p2->recevoirDegats(p1->calculerDegats(*p2));
+
+					if (p2->estKo()) {
+						cout << p2->getNom() << " est KO !" << endl;
+						scoreJoueur++;
+						if (scoreJoueur == 3) break;
+					}
+				}
+			}
+		}
+
+		if (scoreJoueur == 3) {
+			cout << joueurActif->getNom() << " a gagne le combat !" << endl;
+			joueur->ajouterCombatGagne();
+			adversaire.ajouterCombatPerdu();
+		}
+		else if (scoreAdversaire == 3) {
+			cout << adversaire.getNom() << " a gagne le combat !" << endl;
+			adversaire.ajouterCombatGagne();
+			joueur->ajouterCombatPerdu();
+		}
+		else {
+			cout << "Le combat est terminé." << endl;
+		}
+
+
 
 
 	}

@@ -57,7 +57,12 @@ public:
 		}
 		cout << "Faiblesse : " << faiblesse << endl;
 	}
+	bool estKo() const {
+		return hp <= 0;
+	}
+
 };
+
 
 #endif
 
