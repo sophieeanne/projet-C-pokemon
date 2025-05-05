@@ -29,13 +29,13 @@ map<string, Pokemon*> chargerPokemonDepuisFichier(const string& fichierNom) {
         
 
         Pokemon* poke = nullptr;
-        if (type1 == "Feu") {
+        if (type1 == "Feu"||type2=="Feu") {
 			poke = new PokemonFeu(nom, hp, nomAttaque, degat, "Eau");
 		}
-        else if (type1 == "Eau") {
+        else if (type1 == "Eau" || type2 == "Eau") {
 			poke = new PokemonEau(nom, hp, nomAttaque, degat, "Electrik");
         }
-		else if (type1 == "Électrik") {
+		else if (type1 == "Electrik" || type2 == "Electrik") {
 			poke = new PokemonElectrik(nom, hp, nomAttaque, degat, "Sol");
         }
         pokedex[nom] = poke;
