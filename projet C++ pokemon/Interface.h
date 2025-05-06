@@ -20,9 +20,16 @@ public :
 	//constructeur par défaut
 	Interface() : joueurActif(nullptr) {}
 	//constructeur
-	Interface(string NomFichier, string pf, map<string, Pokemon*> p) : fichier(NomFichier), pokemonFichier(pf), pokedex(p), joueurActif(nullptr) {
+	Interface(string NomFichier, string pf, map<string, Pokemon*> p, unique_ptr<Entraineur> jA) : fichier(NomFichier), pokemonFichier(pf), pokedex(p) {
+		joueurActif = move(jA);
 	}
 
+	//setters
+	void setJoueurActif(unique_ptr<Entraineur> jA) {
+		joueurActif = move(jA);
+	}
+	
+	//LES METHODES POUR GERER LES JOUEURS
 	static Joueur creerNouveauJoueur(const map<string, Pokemon*>& pokedex, const string& fichier) {
 		string nom;
 		cout << "Entrez le nom du joueur : ";
@@ -80,12 +87,12 @@ public :
 		}
 
 		string ligne;
+		getline(inFile, ligne); //ignorer la première ligne (en-tête)
 		while (getline(inFile, ligne)) {
 			stringstream ss(ligne);
 			string champ;
 			vector<string> champs;
 
-			// Lire tous les champs de la ligne
 			while (getline(ss, champ, ',')) {
 				champs.push_back(champ);
 			}
@@ -93,25 +100,31 @@ public :
 			if (champs.size() < 1) continue;
 
 			string nom = champs[0];
-			vector<Pokemon*> equipe;  // Utiliser des pointeurs vers Pokémon
+			vector<Pokemon*> equipe;  
 
-			// Les Pokémon vont des index 1 à 6 (inclus si présents)
 			for (size_t i = 1; i <= 6 && i < champs.size(); ++i) {
 				if (!champs[i].empty()) {
 					auto it = pokedex.find(champs[i]);
 					if (it != pokedex.end()) {
-						equipe.push_back(it->second);  // Ajouter un pointeur vers le Pokémon
+						equipe.push_back(it->second);  
 					}
 				}
 			}
 
 			// Badges, Gagnes, Perdus si présents
 			int badges = 0, gagnes = 0, perdus = 0;
-			if (champs.size() >= 10) {
-				badges = stoi(champs[7]);
-				gagnes = stoi(champs[8]);
-				perdus = stoi(champs[9]);
+			try {
+				if (champs.size() >= 10) {
+					if (!champs[7].empty()) badges = std::stoi(champs[7]);
+					if (!champs[8].empty()) gagnes = std::stoi(champs[8]);
+					if (!champs[9].empty()) perdus = std::stoi(champs[9]);
+				}
 			}
+			catch (const std::invalid_argument& e) {
+				cerr << "Erreur de conversion pour le joueur '" << champs[0] << "'. Valeur invalide dans les colonnes numériques." << endl;
+				continue; 
+			}
+
 
 			Joueur joueur(nom, equipe, badges, gagnes, perdus);
 			joueurs.push_back(joueur);
@@ -121,6 +134,55 @@ public :
 		return joueurs;
 	}
 
+	static unique_ptr<Joueur> choisirJoueurActif(const string& fichierJoueurs, const map<string, Pokemon*>& pokedex) {
+		cout << "Saisissez votre pseudo : ";
+		string pseudo;
+		cin >> pseudo;
+
+		vector<Joueur> joueurs = chargerJoueursDepuisFichier(fichierJoueurs, pokedex);
+		for ( auto& joueur : joueurs) {
+			if (joueur.getNom() == pseudo) {
+				cout << "Bienvenue " << joueur.getNom() << " !" << endl;
+				unique_ptr<Joueur> joueurPtr = make_unique<Joueur>(joueur); 
+				return joueurPtr; 
+			}
+		}
+
+		cerr << "Joueur non trouvé. Veuillez créer un compte ou réessayer." << endl;
+		return nullptr;
+	}
+
+
+	//LE MENU PRINCIPAL
+	void Menu() {
+		int choix;
+		do {
+			cout << "=== MENU PRINCIPAL ===" << endl;
+			cout << "1) Gerer mon equipe" << endl;
+			cout << "2) Combattre" << endl;
+			cout << "3) Statistiques" << endl;
+			cout << "4) Quitter" << endl;
+			cin >> choix;
+
+			switch (choix) {
+			case 1:
+				GererEquipe();
+				break;
+			case 2:
+				Combattre();
+				break;
+			case 3:
+				Statistiques();
+				break;
+			case 4:
+				cout << "Au revoir !" << endl;
+				break;
+			default:
+				cout << "Choix invalide. Veuillez reessayer." << endl;
+				break;
+			}
+		} while (choix != 4);	
+	}
 
 	void GererEquipe() {
 		if (!joueurActif) {
