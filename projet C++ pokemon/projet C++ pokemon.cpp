@@ -106,7 +106,8 @@ int main()
 		}
 	}
 	interface.setJoueurActif(move(ja));
-	interface.Menu();
+	//interface.Menu();
+	//interface.Combattre();
 
 	
 
