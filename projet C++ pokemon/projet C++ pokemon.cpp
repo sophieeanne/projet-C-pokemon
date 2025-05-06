@@ -38,7 +38,10 @@ map<string, Pokemon*> chargerPokemonDepuisFichier(const string& fichierNom) {
 		else if (type1 == "Electrik" || type2 == "Electrik") {
 			poke = new PokemonElectrik(nom, hp, nomAttaque, degat, "Sol");
         }
-        pokedex[nom] = poke;
+		if (poke != nullptr) {
+			pokedex[nom] = poke;
+		}
+
 	}
 	return pokedex;
 }
@@ -77,9 +80,11 @@ int main()
 		return 1;
 	}
 
+	//afficherPokedex(pokedex);
+
 
 	unique_ptr<Entraineur> ja = nullptr;
-	Interface interface(nomFichier, pokemonFichier, pokedex,nullptr);
+	Interface interface(nomFichier, pokemonFichier, pokedex, nullptr);
 
 
 	cout << "Bienvenue dans le jeu Pokemon !" << endl;

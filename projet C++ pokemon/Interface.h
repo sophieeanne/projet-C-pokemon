@@ -36,15 +36,42 @@ public :
 		cin >> nom;
 
 		Joueur nouveau(nom, {}, 0, 0, 0);
-		
-		cout << "Initialisation de l'équipe de 6 Pokémon :\n";
-		for (int i = 0; i < 6; ++i) {
-			string nomPoke;
-			cout << "Nom du Pokémon #" << i + 1 << " : ";
-			cin >> nomPoke;
-			nouveau.ajouterPokemon(nomPoke, pokedex);
+		//on affiche le nom des pokemons
+		cout << "=== POKEMONS DISPONIBLES ===" << endl;
+		for (const auto& pair : pokedex) {
+			cout << pair.first << ", ";
+		}
+		cout << endl;
+		cout << "Initialisation de l'equipe de 6 Pokemon :\n";
+		int i = 0;
+		while (i < 6) {
+			string nomPokemon;
+			cout << "Entrez le nom du Pokemon " << i + 1 << " : ";
+			cin >> nomPokemon;
+
+			//vérifier si le Pokémon existe dans le Pokédex
+			auto it = pokedex.find(nomPokemon);
+			if (it == pokedex.end()) {
+				cout << "Le Pokemon '" << nomPokemon << "' n'existe pas dans le Pokedex !" << endl;
+				continue;
+			}
+			bool dejaDansEquipe = false;
+			for (const auto& p : nouveau.getEquipe()) {
+				if (p->getNom() == nomPokemon) {
+					dejaDansEquipe = true;
+					break;
+				}
+			}
+
+			if (dejaDansEquipe) {
+				cout << "Ce Pokemon est deja dans votre equipe. Choisissez-en un autre." << endl;
+				continue;
+			}
+			nouveau.ajouterPokemon(nomPokemon, pokedex);
+			i++;
 		}
 		Interface::enregistrerJoueurDansFichier(nouveau, fichier); 
+		cout << "Le joueur "<<nom<<" a ete cree avec succes !" << endl;
 		return nouveau;
 	}
 	

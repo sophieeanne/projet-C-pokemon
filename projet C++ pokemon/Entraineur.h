@@ -32,25 +32,7 @@ public :
 
 	//méthodes
 	void ajouterPokemon(const string& nomPokemon, const map<string, Pokemon*>& pokedex) {
-		//vérifier si le Pokémon existe dans le Pokédex
 		auto it = pokedex.find(nomPokemon);
-		if (it == pokedex.end()) {
-			cout << "Le Pokemon '" << nomPokemon << "' n'existe pas dans le Pokedex !" << endl;
-			return;
-		}
-		//vérifier si l'équipe est pleine
-		if (equipePleine()) {
-			cout << "L'equipe est deja complete !" << endl;
-			return;
-		}
-		//vérifier si le Pokémon est déjà dans l'équipe
-		for (const auto& p : equipe) {
-			if (p->getNom() == nomPokemon) {
-				cout << "Le Pokemon est deja dans l'equipe !" << endl;
-				return;
-			}
-		}
-		//ajouter le Pokémon à l'équipe
 		equipe.push_back(it->second);
 		cout << nomPokemon << " a ete ajouté a l'equipe !" << endl;
 	}
