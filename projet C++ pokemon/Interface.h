@@ -175,15 +175,71 @@ public :
 			}
 		}
 
-		cerr << "Joueur non trouvé. Veuillez créer un compte ou réessayer." << endl;
 		return nullptr;
 	}
+
+	static void updateJoueurDansFichier(Joueur& joueur, const string& nomFichier) {
+		ifstream inFile(nomFichier);
+		if (!inFile) {
+			cerr << "Erreur de lecture du fichier : " << nomFichier << endl;
+			return;
+		}
+
+		vector<string> lignes;
+		string ligne;
+
+		// Lire toutes les lignes et mettre à jour celle du joueur concerné
+		while (getline(inFile, ligne)) {
+			stringstream ss(ligne);
+			string champ;
+			vector<string> champs;
+
+			while (getline(ss, champ, ',')) {
+				champs.push_back(champ);
+			}
+
+			if (!champs.empty() && champs[0] == joueur.getNom()) {
+				// Mise à jour des statistiques : Badges, CombatsGagnés, CombatsPerdus
+				if (champs.size() >= 10) {
+					champs[7] = to_string(joueur.getBadges());
+					champs[8] = to_string(joueur.getCombatsGagnes());
+					champs[9] = to_string(joueur.getCombatsPerdus());
+				}
+				else {
+					cerr << "Format de ligne invalide pour le joueur : " << joueur.getNom() << endl;
+				}
+			}
+
+			// Recomposer la ligne et l'ajouter à la liste
+			string nouvelleLigne;
+			for (size_t i = 0; i < champs.size(); ++i) {
+				nouvelleLigne += champs[i];
+				if (i != champs.size() - 1) nouvelleLigne += ",";
+			}
+			lignes.push_back(nouvelleLigne);
+		}
+		inFile.close();
+
+		// Réécrire le fichier avec les données mises à jour
+		ofstream outFile(nomFichier);
+		if (!outFile) {
+			cerr << "Erreur d'écriture dans le fichier : " << nomFichier << endl;
+			return;
+		}
+
+		for (const auto& l : lignes) {
+			outFile << l << endl;
+		}
+		outFile.close();
+	}	
+
 
 
 	//LE MENU PRINCIPAL
 	void Menu() {
 		int choix;
 		do {
+			cout << endl;
 			cout << "=== MENU PRINCIPAL ===" << endl;
 			cout << "1) Gerer mon equipe" << endl;
 			cout << "2) Combattre" << endl;
@@ -210,7 +266,8 @@ public :
 			}
 		} while (choix != 4);	
 	}
-
+	
+	//OK !
 	void GererEquipe() {
 		if (!joueurActif) {
 			cout << "Aucun joueur actif ! Veuillez démarrer un jeu." << endl;
@@ -242,6 +299,7 @@ public :
 		}
 	}
 
+	//OK !	
 	void Combattre() {
 		cout << "=== COMBATTRE ===" << endl;
 		cout << "1) Affronter un joueur" << endl;
@@ -250,67 +308,73 @@ public :
 		cout << "4) Retour" << endl;
 		int choix;
 		cin >> choix;
-		if (choix < 1 || choix>5) {
-			do {
-				cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 4" << endl;
-
-			} while (choix < 1 || choix>5);
-		}
-		switch (choix) {
-		case 1:
-			AffronterJoueur();
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		case 4:
-			break;
-		default:
-			break;
-		}
+		do {
+			switch (choix) {
+			case 1:
+				AffronterJoueur();
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+			default:
+				cout << "Choix invalide. Veuillez reessayer." << endl;
+				break;
+			}
+		} while (choix < 1 || choix>4);
 	}
 
+	//OK ! 
 	void AffronterJoueur() {
-		cout << "Quel joueur voulez-vous affronter ?" << endl;
-		string nomAdversaire;
-		cin >> nomAdversaire;
-		//on cherche le nom de l'adversaire dans le fichier joueur
+		vector<string> nomsJoueurs;
 		ifstream inFile(fichierJoueurs);
 		if (!inFile) {
 			cerr << "Erreur de lecture du fichier " << fichierJoueurs << endl;
 			return;
 		}
+
 		string ligne;
-		bool joueurTrouve = false;
+		getline(inFile, ligne);
 		while (getline(inFile, ligne)) {
 			stringstream ss(ligne);
 			string champ;
-			vector<string> champs;
-
-			// Lire tous les champs de la ligne
-			while (getline(ss, champ, ',')) {
-				champs.push_back(champ);
-			}
-
-			if (champs.size() < 1) continue;
-
-			if (champs[0] == nomAdversaire) {
-				joueurTrouve = true;
-				break;
+			getline(ss, champ, ','); 
+			if (!champ.empty()) {
+				nomsJoueurs.push_back(champ);
 			}
 		}
 		inFile.close();
-		if (!joueurTrouve) {
-			cout << "Joueur non trouvé." << endl;
-			return;
+
+		cout << "=== Joueurs disponibles ===" << endl;
+		for (const string& nom : nomsJoueurs) {
+			cout << "- " << nom << endl;
 		}
-		cout << "Vous allez affronter " << nomAdversaire << endl;
+
+		string nomAdversaire;
+		bool joueurTrouve = false;
+
+		do {
+			cout << "Quel joueur voulez-vous affronter ? ";
+			cin >> nomAdversaire;
+
+			for (const string& nom : nomsJoueurs) {
+				if (nom == nomAdversaire) {
+					joueurTrouve = true;
+					break;
+				}
+			}
+
+			if (!joueurTrouve) {
+				cout << "Joueur non trouvé. Veuillez réessayer." << endl;
+			}
+		} while (!joueurTrouve);
+
+		cout << "Vous allez affronter " << nomAdversaire << " !" << endl;
+
 		Joueur adversaire;
 		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
-		if (joueur) {
-			joueur->ajouterCombatGagne();
-		}
 		vector<Joueur> tousLesJoueurs = chargerJoueursDepuisFichier(fichierJoueurs, pokedex);
 		for (auto j : tousLesJoueurs) {
 			if (j.getNom() == nomAdversaire) {
@@ -318,14 +382,17 @@ public :
 				break;
 			}
 		}
+
+
 		int scoreJoueur = 0;
 		int scoreAdversaire = 0;
 
-		//On choisit au hasard qui commence (1 c'est le joueur, 2 c'est l'adversaire)
-		int quiCommence = rand() % 2 + 1;
+		bool tourDuJoueur = rand() % 2 == 0;
+		int round = 1;
 
-		//Boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
+		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
 		while (scoreJoueur < 3 && scoreAdversaire < 3) {
+			cout << "\n===== ROUND " << round << " =====" << endl;
 			Pokemon* p1 = joueur->getPokemonActif();
 			Pokemon* p2 = adversaire.getPokemonActif();
 
@@ -334,11 +401,12 @@ public :
 				break;
 			}
 
-			if (quiCommence == 1) {
+			if (tourDuJoueur) {
 				//joueur attaque
 				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 				p1->attaquer(*p2);
 				p2->recevoirDegats(p1->calculerDegats(*p2));
+				//PauseConsole();
 
 				if (p2->estKo()) {
 					cout << p2->getNom() << " est KO !" << endl;
@@ -351,9 +419,11 @@ public :
 					cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 					p2->attaquer(*p1);
 					p1->recevoirDegats(p2->calculerDegats(*p1));
+					//PauseConsole();
 
 					if (p1->estKo()) {
 						cout << p1->getNom() << " est KO !" << endl;
+						//PauseConsole();
 						scoreAdversaire++;
 						if (scoreAdversaire == 3) break;
 					}
@@ -364,10 +434,12 @@ public :
 				cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 				p2->attaquer(*p1);
 				p1->recevoirDegats(p2->calculerDegats(*p1));
+				//PauseConsole();
 
 				if (p1->estKo()) {
 					cout << p1->getNom() << " est KO !" << endl;
 					scoreAdversaire++;
+					//PauseConsole();
 					if (scoreAdversaire == 3) break;
 				}
 
@@ -376,37 +448,79 @@ public :
 					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 					p1->attaquer(*p2);
 					p2->recevoirDegats(p1->calculerDegats(*p2));
+					//PauseConsole();
 
 					if (p2->estKo()) {
 						cout << p2->getNom() << " est KO !" << endl;
 						scoreJoueur++;
+						//PauseConsole();
 						if (scoreJoueur == 3) break;
 					}
 				}
 			}
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << adversaire.getNom() << ": " << scoreAdversaire << endl;
+			PauseConsole();
+			round++;
+			tourDuJoueur = !tourDuJoueur;
 		}
 
+		cout << endl;
+		cout << "=== FIN DU COMBAT ===" << endl;
+		PauseConsole();
+		//fin du combat : on affiche les scores et qui a gagné
 		if (scoreJoueur == 3) {
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << adversaire.getNom() << ": " << scoreAdversaire << endl;
+
 			cout << joueurActif->getNom() << " a gagne le combat !" << endl;
+
+			cout << joueur->getNom() << " : Encore une nouvelle victoire ! " << endl;
+			cout << adversaire.getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
+
 			joueur->ajouterCombatGagne();
 			adversaire.ajouterCombatPerdu();
+
+			updateJoueurDansFichier(*joueur, fichierJoueurs);
+			updateJoueurDansFichier(adversaire, fichierJoueurs);
 		}
 		else if (scoreAdversaire == 3) {
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << adversaire.getNom() << ": " << scoreAdversaire << endl;
 			cout << adversaire.getNom() << " a gagne le combat !" << endl;
+
+			cout << adversaire.getNom() << " : Encore une nouvelle victoire ! " << endl;
+			cout << joueur->getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
+
 			adversaire.ajouterCombatGagne();
 			joueur->ajouterCombatPerdu();
+
+			updateJoueurDansFichier(*joueur, fichierJoueurs);
+			updateJoueurDansFichier(adversaire, fichierJoueurs);
 		}
 		else {
 			cout << "Le combat est terminé." << endl;
 		}
 
-
-
-
 	}
 
+	//OK !
 	void Statistiques() {
-		//modifier quand y'aura la classe Entraineur
+		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
+		if (joueur) {
+			joueur->afficherStatistiques();
+		}
+		else {
+			cout << "Aucun joueur actif !" << endl;
+		}
 	}
+
+	//OK !
+	void PauseConsole() {
+		cout << "Appuyez sur une touche pour continuer..." << endl;
+		cin.ignore();
+		cin.get();
+	}
+
 };
 

@@ -98,16 +98,19 @@ int main()
 		ja = make_unique<Joueur>(Interface::creerNouveauJoueur(pokedex, nomFichier));
 	}
 	else if (choix == 2) {
+		do {
+			ja = Interface::choisirJoueurActif(nomFichier, pokedex);
+			if (!ja) {
+				cout << "Nom de joueur invalide. Veuillez reessayer." << endl;
+			}
+		} while (!ja);
 
-		ja = Interface::choisirJoueurActif(nomFichier, pokedex); 
-		if (!ja) {
-			cout << "Le joueur n'existe pas !" << endl;
-			return 1;
-		}
 	}
 	interface.setJoueurActif(move(ja));
-	//interface.Menu();
-	//interface.Combattre();
+
+
+	interface.Menu();
+
 
 	
 

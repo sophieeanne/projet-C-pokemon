@@ -34,13 +34,13 @@ public :
 	void ajouterPokemon(const string& nomPokemon, const map<string, Pokemon*>& pokedex) {
 		auto it = pokedex.find(nomPokemon);
 		equipe.push_back(it->second);
-		cout << nomPokemon << " a ete ajouté a l'equipe !" << endl;
+		cout << nomPokemon << " a ete ajoute a l'equipe !" << endl;
 	}
 
 	void afficherEquipe() {
 		cout << "=== MON EQUIPE ===" << endl;
 		for (int i = 0; i < equipe.size(); i++) {
-			cout << i + 1 << ") " << equipe[i]->getNom() << endl;
+			equipe[i]->afficherInfos();
 		}
 	}
 	bool equipePleine() {
@@ -62,6 +62,9 @@ public :
 			if (pokemon->estKo()) {
 				pokemon->setHp(100); // Remettre les HP à 100
 				cout << pokemon->getNom() << " a ete soigne !" << endl;
+			}
+			else {
+				cout << "Tous les Pokemon sont en bonne sante !" << endl;
 			}
 		}
 	}
@@ -103,7 +106,7 @@ public:
 	void afficherStatistiques() {
 		cout << "=== STATISTIQUES ===" << endl;
 		cout << "Badges : " << badges << endl;
-		cout << "Combats gagnés : " << combatsGagnes << endl;
+		cout << "Combats gagnes : " << combatsGagnes << endl;
 		cout << "Combats perdus : " << combatsPerdus << endl;
 	}
 
