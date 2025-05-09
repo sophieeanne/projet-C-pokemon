@@ -281,7 +281,7 @@ public :
 		map<string, pair<string, string>> gymData = {
 			  {"Feu", {"Flamme", "Gym Feu"}},
 			  {"Eau", {"Cascade", "Gym Eau"}},
-			  {"Electrik", {"Volt", "Gym Électrik"}},
+			  {"Electrik", {"Volt", "Gym Electrik"}},
 		};
 
 		string badge = "Badge Inconnu";
