@@ -109,7 +109,7 @@ public:
 	//méthodes
 	void afficherStatistiques() {
 		cout << "=== STATISTIQUES ===" << endl;
-		cout << "Badges : " << nbBadges << endl;
+		cout << "Badges : " << nbBadges() << endl;
 		cout << "Combats gagnes : " << combatsGagnes << endl;
 		cout << "Combats perdus : " << combatsPerdus << endl;
 	}

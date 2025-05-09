@@ -6,6 +6,7 @@ using namespace std;
 #include <map>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include "Pokemon.h"
 #include "Entraineur.h"
 class Interface
@@ -35,7 +36,8 @@ public :
 		cout << "Entrez le nom du joueur : ";
 		cin >> nom;
 
-		Joueur nouveau(nom, {}, 0, 0, 0);
+		vector<string> badgesGagnes;
+		Joueur nouveau(nom, {}, badgesGagnes , 0, 0);
 		//on affiche le nom des pokemons
 		cout << "=== POKEMONS DISPONIBLES ===" << endl;
 		for (const auto& pair : pokedex) {
@@ -249,6 +251,63 @@ public :
 			outFile << l << endl;
 		}
 		outFile.close();
+	}
+
+	//LES METHODES POUR GERER LES LEADERSGYM
+	LeaderGym promouvoirEnLeaderGym(Joueur& joueur) {
+		map<string, int> typeCounts;
+
+		//on compte le type de pokemon le plus présent dans l'équipe
+		for (auto* p : joueur.getEquipe()) {
+			if (p) {
+				string t1 = p->getType1();
+				string t2 = p->getType2();
+
+				if (!t1.empty()) typeCounts[t1]++;
+				if (!t2.empty()) typeCounts[t2]++;
+			}
+		}
+
+		//on trouve le type dominant (le type dominant determine le nom de la gym et du badge)
+		string typeDominant = "";
+		int maxCount = 0;
+		for (const auto& pair : typeCounts) {
+			if (pair.second > maxCount) {
+				maxCount = pair.second;
+				typeDominant = pair.first;
+			}
+		}
+
+		map<string, pair<string, string>> gymData = {
+			  {"Feu", {"Flamme", "Gym Feu"}},
+			  {"Eau", {"Cascade", "Gym Eau"}},
+			  {"Electrik", {"Volt", "Gym Électrik"}},
+		};
+
+		string badge = "Badge Inconnu";
+		string gym = "Gym Inconnu";
+		if (gymData.find(typeDominant) != gymData.end()) {
+			badge = gymData[typeDominant].first;
+			gym = gymData[typeDominant].second;
+		}
+
+		LeaderGym leader(joueur.getNom(), joueur.getEquipe(), badge, gym);
+
+		ofstream fichier("leaders.csv", ios::app);
+		if (!fichier) {
+			cerr << "Erreur lors de l'ouverture de leaders.csv" << endl;
+			return leader;
+		}
+
+		fichier << leader.getNom() << "," << leader.getNomGym() << "," << leader.getBadgeGym();
+		for (auto* p : leader.getEquipe()) {
+			fichier << "," << (p ? p->getNom() : "");
+		}
+		fichier << endl;
+		fichier.close();
+
+		cout << joueur.getNom() << " a ete promu Leader de " << gym << " avec le badge " << badge << " !" << endl;
+		return leader;
 	}
 
 
