@@ -37,7 +37,7 @@ public:
 			cout << it->first << " (puissance " << it->second << ")";
 		}
 
-		cout << " et inflige " << degats << "degats ! " << endl;
+		cout << " et inflige " << degats << " degats ! " << endl;
 		cible.recevoirDegats(degats);
 	}
 

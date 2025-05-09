@@ -543,7 +543,7 @@ public :
 			}
 
 			if (!joueurTrouve) {
-				cout << "Joueur non trouvé. Veuillez réessayer." << endl;
+				cout << "Joueur non trouve. Veuillez reessayer." << endl;
 			}
 		} while (!joueurTrouve);
 
@@ -710,7 +710,7 @@ public :
 			}
 
 			if (!leaderTrouve) {
-				cout << "Leader non trouvé. Veuillez réessayer." << endl;
+				cout << "Leader non trouve. Veuillez reessayer." << endl;
 			}
 		} while (!leaderTrouve);
 		cout << "Vous allez affronter " << nomLeader << " !" << endl;

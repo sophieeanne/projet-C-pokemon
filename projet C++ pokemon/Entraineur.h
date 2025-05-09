@@ -76,7 +76,7 @@ public :
 			i++;
 		}
 		int choix;
-		cout << "Choisissez le numéro du Pokemon a changer : ";
+		cout << "Choisissez le numero du Pokemon a changer : ";
 		cin >> choix;
 		cout << "A quel endroit voulez-vous le mettre ? (1-" << equipe.size() << ") : ";
 		int choix2;
