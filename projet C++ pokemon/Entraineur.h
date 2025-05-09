@@ -64,9 +64,10 @@ public :
 				cout << pokemon->getNom() << " a ete soigne !" << endl;
 			}
 			else {
-				cout << "Tous les Pokemon sont en bonne sante !" << endl;
+				cout << pokemon->getNom() << " n a pas besoin de soins." << endl ;
 			}
 		}
+		cout << "Tous les Pokemon sont en bonne sante !" << endl;
 	}
 
 	void changerOrdre() {
