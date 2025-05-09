@@ -94,9 +94,17 @@ public :
 				outFile << ","; // case vide si pas de Pokémon
 			}
 		}
+		const auto& badges = joueur.getBadges(); 
+		string badgesString;
+		for (size_t i = 0; i < badges.size(); ++i) {
+			badgesString += badges[i];
+			if (i < badges.size() - 1) {
+				badgesString += '|';
+			}
+		}
 
 		// Ajouter ensuite les nouveaux attributs
-		outFile << "," << joueur.getBadges()
+		outFile << "," << badgesString
 			<< "," << joueur.getCombatsGagnes()
 			<< "," << joueur.getCombatsPerdus()
 			<< endl;
@@ -138,22 +146,29 @@ public :
 				}
 			}
 
-			// Badges, Gagnes, Perdus si présents
-			int badges = 0, gagnes = 0, perdus = 0;
-			try {
-				if (champs.size() >= 10) {
-					if (!champs[7].empty()) badges = std::stoi(champs[7]);
-					if (!champs[8].empty()) gagnes = std::stoi(champs[8]);
-					if (!champs[9].empty()) perdus = std::stoi(champs[9]);
+			vector<string> badgesGagnes;
+			if (champs.size() > 7 && !champs[7].empty()) {
+				stringstream ssBadges(champs[7]);
+				string badge;
+				while (getline(ssBadges, badge, '|')) {
+					badgesGagnes.push_back(badge);
 				}
 			}
-			catch (const std::invalid_argument& e) {
-				cerr << "Erreur de conversion pour le joueur '" << champs[0] << "'. Valeur invalide dans les colonnes numériques." << endl;
-				continue; 
+
+			//Gagnes, Perdus si présents
+			int combatsGagnes = 0, combatsPerdus = 0;
+			try {
+				if (champs.size() > 8 && !champs[8].empty())
+					combatsGagnes = stoi(champs[8]);
+				if (champs.size() > 9 && !champs[9].empty())
+					combatsPerdus = stoi(champs[9]);
+			}
+			catch (const invalid_argument&) {
+				cerr << "Erreur de conversion pour les stats de " << nom << endl;
+				continue;
 			}
 
-
-			Joueur joueur(nom, equipe, badges, gagnes, perdus);
+			Joueur joueur(nom, equipe, badgesGagnes, combatsGagnes, combatsPerdus);
 			joueurs.push_back(joueur);
 		}
 
@@ -188,7 +203,6 @@ public :
 		vector<string> lignes;
 		string ligne;
 
-		// Lire toutes les lignes et mettre à jour celle du joueur concerné
 		while (getline(inFile, ligne)) {
 			stringstream ss(ligne);
 			string champ;
@@ -199,9 +213,15 @@ public :
 			}
 
 			if (!champs.empty() && champs[0] == joueur.getNom()) {
-				// Mise à jour des statistiques : Badges, CombatsGagnés, CombatsPerdus
 				if (champs.size() >= 10) {
-					champs[7] = to_string(joueur.getBadges());
+					const vector<string>& badges = joueur.getBadges();
+					string badgesStr;
+					for (size_t i = 0; i < badges.size(); ++i) {
+						badgesStr += badges[i];
+						if (i != badges.size() - 1) badgesStr += "|";
+					}
+
+					champs[7] = badgesStr;
 					champs[8] = to_string(joueur.getCombatsGagnes());
 					champs[9] = to_string(joueur.getCombatsPerdus());
 				}
@@ -210,7 +230,6 @@ public :
 				}
 			}
 
-			// Recomposer la ligne et l'ajouter à la liste
 			string nouvelleLigne;
 			for (size_t i = 0; i < champs.size(); ++i) {
 				nouvelleLigne += champs[i];
@@ -220,7 +239,6 @@ public :
 		}
 		inFile.close();
 
-		// Réécrire le fichier avec les données mises à jour
 		ofstream outFile(nomFichier);
 		if (!outFile) {
 			cerr << "Erreur d'écriture dans le fichier : " << nomFichier << endl;
@@ -231,7 +249,8 @@ public :
 			outFile << l << endl;
 		}
 		outFile.close();
-	}	
+	}
+
 
 
 

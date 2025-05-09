@@ -14,7 +14,7 @@ map<string, Pokemon*> chargerPokemonDepuisFichier(const string& fichierNom) {
 		return pokedex;
 	}
 	string ligne;
-	getline(fichier, ligne); // Lire la première ligne (en-tête)
+	getline(fichier, ligne); 
 	while (getline(fichier, ligne)) {
 		stringstream ss(ligne);
 		string nom, type1, type2, hpStr, nomAttaque, degatStr;

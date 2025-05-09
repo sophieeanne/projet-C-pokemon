@@ -73,17 +73,17 @@ public :
 class Joueur : public Entraineur
 {
 private:
-	int badges;
+	vector<string> badges;
 	int combatsGagnes;
 	int combatsPerdus;
 public:
 	//constructeur par défaut
 	Joueur() : Entraineur("", {}), badges(0), combatsGagnes(0), combatsPerdus(0) {} // Constructeur par défaut
 	//constructeur
-	Joueur(string Nom, vector<Pokemon*> Equipe, int Badges, int CombatsGagnes, int CombatsPerdus) : Entraineur(Nom, Equipe), badges(Badges), combatsGagnes(CombatsGagnes), combatsPerdus(CombatsPerdus) {}
+	Joueur(string Nom, vector<Pokemon*> Equipe, vector<string> Badges, int CombatsGagnes, int CombatsPerdus) : Entraineur(Nom, Equipe), badges(Badges), combatsGagnes(CombatsGagnes), combatsPerdus(CombatsPerdus) {}
 
 	//setters
-	void setBadges(int Badges) {
+	void setBadges(vector<string> Badges) {
 		badges = Badges;
 	}
 	void setCombatsGagnes(int CombatsGagnes) {
@@ -93,7 +93,7 @@ public:
 		combatsPerdus = CombatsPerdus;
 	}
 	//getters
-	int getBadges() {
+	vector<string> getBadges() {
 		return badges;
 	}
 	int getCombatsGagnes() {
@@ -102,17 +102,29 @@ public:
 	int getCombatsPerdus() {
 		return combatsPerdus;
 	}
+	int nbBadges() {
+		return badges.size();
+	}
 
+	//méthodes
 	void afficherStatistiques() {
 		cout << "=== STATISTIQUES ===" << endl;
-		cout << "Badges : " << badges << endl;
+		cout << "Badges : " << nbBadges << endl;
 		cout << "Combats gagnes : " << combatsGagnes << endl;
 		cout << "Combats perdus : " << combatsPerdus << endl;
 	}
 
-	void ajouterBadge() {
-		badges++;
+	void ajouterBadge(string badge) {
+		auto it = find(badges.begin(), badges.end(), badge);
+		if (it == badges.end()) {
+			badges.push_back(badge);
+			cout << "Badge " << badge << " ajoute !" << endl;
+		}
+		else {
+			cout << "Vous avez deja ce badge !" << endl;
+		}
 	}
+
 	void ajouterCombatGagne() {
 		combatsGagnes++;
 	}
