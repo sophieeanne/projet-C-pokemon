@@ -92,7 +92,26 @@ int main()
 	cout << "2) Charger un utilisateur existant" << endl;
 
 	int choix;
-	cin >> choix;
+	bool entreeValide = false;
+
+	while (!entreeValide) {
+		try {
+			string saisie;
+			cin >> saisie;
+
+			if (!all_of(saisie.begin(), saisie.end(), ::isdigit)) {
+				throw invalid_argument("Choix invalide, la saisie doit etre un entier.");
+			}
+			choix = stoi(saisie);
+			if (choix < 1 || choix > 2) {
+				throw out_of_range("Choix invalide, la saisie doit etre dans les options proposees.");
+			}
+			entreeValide = true;
+		}
+		catch (const exception& e) {
+			cout << e.what() << " Veuillez reessayer." << endl;
+		}
+	}
 
 	if (choix == 1) {
 		ja = make_unique<Joueur>(Interface::creerNouveauJoueur(pokedex, nomFichier));

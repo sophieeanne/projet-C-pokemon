@@ -409,34 +409,50 @@ public :
 
 	//LE MENU PRINCIPAL
 	void Menu() {
-		int choix;
-		do {
-			cout << endl;
-			cout << "=== MENU PRINCIPAL ===" << endl;
-			cout << "1) Gerer mon equipe" << endl;
-			cout << "2) Combattre" << endl;
-			cout << "3) Statistiques" << endl;
-			cout << "4) Quitter" << endl;
-			cin >> choix;
 
-			switch (choix) {
-			case 1:
-				GererEquipe();
-				break;
-			case 2:
-				Combattre();
-				break;
-			case 3:
-				Statistiques();
-				break;
-			case 4:
-				cout << "Au revoir !" << endl;
-				break;
-			default:
-				cout << "Choix invalide. Veuillez reessayer." << endl;
-				break;
+		cout << endl;
+		cout << "=== MENU PRINCIPAL ===" << endl;
+		cout << "1) Gerer mon equipe" << endl;
+		cout << "2) Combattre" << endl;
+		cout << "3) Statistiques" << endl;
+		cout << "4) Quitter" << endl;
+		int choix;
+		bool entreeValide = false;
+
+
+		while (!entreeValide) {
+			try {
+				string saisie;
+				cin >> saisie;
+
+				if (!all_of(saisie.begin(), saisie.end(), ::isdigit)) {
+					throw invalid_argument("Choix invalide, la saisie doit etre un entier.");
+				}
+				choix = stoi(saisie);
+				if (choix < 1 || choix > 4) {
+					throw out_of_range("Choix invalide, la saisie doit etre dans les options proposees.");
+				}
+				entreeValide = true;
 			}
-		} while (choix != 4);	
+			catch (const exception& e) {
+				cout << e.what() << " Veuillez reessayer." << endl;
+			}
+		}
+
+		switch (choix) {
+		case 1:
+			GererEquipe();
+			break;
+		case 2:
+			Combattre();
+			break;
+		case 3:
+			Statistiques();
+			break;
+		case 4:
+			cout << "Au revoir !" << endl;
+			break;
+		}
 	}
 	
 	//OK !
@@ -452,26 +468,40 @@ public :
 		cout << "3) Changer l'ordre des pokemons" << endl;
 		cout << "4) Retour" << endl;
 		int choix;
-		cin >> choix;
-		do {
-			switch (choix) {
-			case 1:
-				joueur->afficherEquipe();
-				break;
-			case 2:
-				joueur->soignerPokemon();
-				break;
-			case 3:
-				joueur->changerOrdre();
-				updateJoueurDansFichier(*joueur, fichierJoueurs);
-				break;
-			case 4:
-				break;
-			default:
-				cout << "Choix invalide. Veuillez reessayer." << endl;
-				break;
+		bool entreeValide = false;
+		while (!entreeValide) {
+			try {
+				string saisie;
+				cin >> saisie;
+
+				if (!all_of(saisie.begin(), saisie.end(), ::isdigit)) {
+					throw invalid_argument("Choix invalide, la saisie doit etre un entier.");
+				}
+				choix = stoi(saisie);
+				if (choix < 1 || choix > 4) {
+					throw out_of_range("Choix invalide, la saisie doit etre dans les options proposees.");
+				}
+				entreeValide = true;
 			}
-		} while (choix < 1 || choix > 4);
+			catch (const exception& e) {
+				cout << e.what() << " Veuillez reessayer." << endl;
+			}
+		}
+
+		switch (choix) {
+		case 1:
+			joueur->afficherEquipe();
+			break;
+		case 2:
+			joueur->soignerPokemon();
+			break;
+		case 3:
+			joueur->changerOrdre();
+			updateJoueurDansFichier(*joueur, fichierJoueurs);
+			break;
+		case 4:
+			break;
+		}
 	}
 
 	//OK !	
@@ -482,8 +512,27 @@ public :
 		cout << "3) Maitre Pokemon (debloque apres 8 badges)" << endl;
 		cout << "4) Retour" << endl;
 		int choix;
-		cin >> choix;
-		do {
+		bool entreeValide = false;
+
+		while (!entreeValide) {
+			try {
+				string saisie;
+				cin >> saisie;
+
+				if (!all_of(saisie.begin(), saisie.end(), ::isdigit)) {
+					throw invalid_argument("Choix invalide, la saisie doit etre un entier.");
+				}
+				choix = stoi(saisie);
+				if (choix < 1 || choix > 4) {
+					throw out_of_range("Choix invalide, la saisie doit etre dans les options proposees.");
+				}
+				entreeValide = true;
+			}
+			catch (const exception& e) {
+				cout << e.what() << " Veuillez reessayer." << endl;
+			}
+		}
+
 			switch (choix) {
 			case 1:
 				AffronterJoueur();
@@ -495,11 +544,7 @@ public :
 				break;
 			case 4:
 				break;
-			default:
-				cout << "Choix invalide. Veuillez reessayer." << endl;
-				break;
 			}
-		} while (choix < 1 || choix>4);
 	}
 
 	//OK ! 
