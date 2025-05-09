@@ -76,24 +76,51 @@ public :
 			cout << i + 1 << " : " << pokemon->getNom() << endl;
 			i++;
 		}
+
 		int choix;
-		cout << "Choisissez le numero du Pokemon a changer : ";
-		cin >> choix;
-		cout << "A quel endroit voulez-vous le mettre ? (1-" << equipe.size() << ") : ";
-		int choix2;
-		cin >> choix2;
-		if (choix > 0 && choix <= equipe.size() && choix2 > 0 && choix2 <= equipe.size()) {
-			swap(equipe[choix - 1], equipe[choix2 - 1]);
-			cout << "Pokemon " << equipe[choix - 1]->getNom() << " a ete deplace !" << endl;
-			i = 0;
-			for (auto& pokemon : equipe) {
-				cout << i + 1 << " : " << pokemon->getNom() << endl;
-				i++;
+		bool entreeValide = false;
+		while (!entreeValide) {
+			try {
+				cout << "Choisissez le numero du Pokemon a changer : ";
+				cin >> choix;
+				if (cin.fail() || choix<1 || choix>equipe.size()) {
+					throw out_of_range("Choix invalide.");
+				}
+				entreeValide = true;
+			}
+			catch (const exception& e) {
+				cout << e.what() << "Veuillez reessayer." << endl;
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			}
 		}
-		else {
-			cout << "Choix invalide !" << endl;
+
+		int choix2;
+		entreeValide = false;
+		while (!entreeValide) {
+			try {
+				cout << "A quel endroit voulez-vous le mettre ? (1-" << equipe.size() << ") : ";
+				cin >> choix2;
+				if (cin.fail() || choix2<1 || choix2>equipe.size()) {
+					throw out_of_range("Choix invalide.");
+				}
+				entreeValide = true;
+			}
+			catch (const exception& e) {
+				cout << e.what() << "Veuillez reessayer." << endl;
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			}
 		}
+
+		swap(equipe[choix - 1], equipe[choix2 - 1]);
+		cout << "Pokemon " << equipe[choix - 1]->getNom() << " a ete deplace !" << endl;
+		i = 0;
+		for (auto& pokemon : equipe) {
+			cout << i + 1 << " : " << pokemon->getNom() << endl;
+			i++;
+		}
+		
 	}
 };
 class Joueur : public Entraineur
