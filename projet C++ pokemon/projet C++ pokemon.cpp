@@ -107,8 +107,6 @@ int main()
 
 	}
 	interface.setJoueurActif(move(ja));
-
-
 	interface.Menu();
 
 

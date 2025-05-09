@@ -69,6 +69,31 @@ public :
 		}
 	}
 
+	void changerOrdre() {
+		int i = 0;
+		for (auto& pokemon : equipe) {
+			cout << i + 1 << " : " << pokemon->getNom() << endl;
+			i++;
+		}
+		int choix;
+		cout << "Choisissez le numéro du Pokemon a changer : ";
+		cin >> choix;
+		cout << "A quel endroit voulez-vous le mettre ? (1-" << equipe.size() << ") : ";
+		int choix2;
+		cin >> choix2;
+		if (choix > 0 && choix <= equipe.size() && choix2 > 0 && choix2 <= equipe.size()) {
+			swap(equipe[choix - 1], equipe[choix2 - 1]);
+			cout << "Pokemon " << equipe[choix - 1]->getNom() << " a ete deplace !" << endl;
+			i = 0;
+			for (auto& pokemon : equipe) {
+				cout << i + 1 << " : " << pokemon->getNom() << endl;
+				i++;
+			}
+		}
+		else {
+			cout << "Choix invalide !" << endl;
+		}
+	}
 };
 class Joueur : public Entraineur
 {

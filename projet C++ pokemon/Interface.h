@@ -17,6 +17,7 @@ public :
 	string pokemonFichier = "pokemon.csv";
 	unique_ptr<Entraineur> joueurActif;
 	string fichierJoueurs = "joueur.csv";
+	string fichierLeaders = "leaders.csv";
 
 	//constructeur par défaut
 	Interface() : joueurActif(nullptr) {}
@@ -215,6 +216,21 @@ public :
 			}
 
 			if (!champs.empty() && champs[0] == joueur.getNom()) {
+				const auto& equipe = joueur.getEquipe();
+				for (int i = 0; i < 6; ++i) {
+					if (i < equipe.size()) {
+						if (champs.size() > i + 1)
+							champs[i + 1] = equipe[i]->getNom();
+						else
+							champs.push_back(equipe[i]->getNom());
+					}
+					else {
+						if (champs.size() > i + 1)
+							champs[i + 1] = "";
+						else
+							champs.push_back("");
+					}
+				}
 				if (champs.size() >= 10) {
 					const vector<string>& badges = joueur.getBadges();
 					string badgesStr;
@@ -253,8 +269,9 @@ public :
 		outFile.close();
 	}
 
+
 	//LES METHODES POUR GERER LES LEADERSGYM
-	LeaderGym promouvoirEnLeaderGym(Joueur& joueur) {
+	LeaderGym promouvoirEnLeaderGym(Joueur& joueur, const string& leaderBattu) {
 		map<string, int> typeCounts;
 
 		//on compte le type de pokemon le plus présent dans l'équipe
@@ -267,8 +284,8 @@ public :
 				if (!t2.empty()) typeCounts[t2]++;
 			}
 		}
-
-		//on trouve le type dominant (le type dominant determine le nom de la gym et du badge)
+		
+		//on determine le type dominant
 		string typeDominant = "";
 		int maxCount = 0;
 		for (const auto& pair : typeCounts) {
@@ -278,12 +295,15 @@ public :
 			}
 		}
 
+		//les leaders possibles et leurs gymnases
 		map<string, pair<string, string>> gymData = {
 			  {"Feu", {"Flamme", "Gym Feu"}},
 			  {"Eau", {"Cascade", "Gym Eau"}},
 			  {"Electrik", {"Volt", "Gym Electrik"}},
+			  {"Feu", {"Flamme", "Volcano"}}
 		};
 
+		//on cherche le badge et le gymnase correspondant au type dominant
 		string badge = "Badge Inconnu";
 		string gym = "Gym Inconnu";
 		if (gymData.find(typeDominant) != gymData.end()) {
@@ -291,23 +311,97 @@ public :
 			gym = gymData[typeDominant].second;
 		}
 
+		//on crée le leader gym
 		LeaderGym leader(joueur.getNom(), joueur.getEquipe(), badge, gym);
-
-		ofstream fichier("leaders.csv", ios::app);
+		ifstream fichier("leaders.csv");
 		if (!fichier) {
 			cerr << "Erreur lors de l'ouverture de leaders.csv" << endl;
 			return leader;
 		}
 
-		fichier << leader.getNom() << "," << leader.getNomGym() << "," << leader.getBadgeGym();
-		for (auto* p : leader.getEquipe()) {
-			fichier << "," << (p ? p->getNom() : "");
+		vector<string> lignes;
+		string ligne;
+
+		bool leaderBattuTrouve = false;
+		while (getline(fichier, ligne)) {
+			stringstream ss(ligne);
+			string champ;
+			vector<string> champs;
+
+			while (getline(ss, champ, ',')) {
+				champs.push_back(champ);
+			}
+
+			if (!champs.empty() && champs[0] == leaderBattu) {
+				// Si on trouve le leader battu, on remplace la ligne par le nouveau leader
+				string nouvelleLigne = leader.getNom() + "," + leader.getNomGym() + "," + leader.getBadgeGym();
+				for (auto* p : leader.getEquipe()) {
+					nouvelleLigne += "," + (p ? p->getNom() : "");
+				}
+				lignes.push_back(nouvelleLigne);
+				leaderBattuTrouve = true;
+			}
+			else {
+				lignes.push_back(ligne);
+			}
 		}
-		fichier << endl;
 		fichier.close();
+		if (!leaderBattuTrouve) {
+			cerr << "Leader battu non trouvé : " << leaderBattu << endl;
+			return leader;
+		}
+		ofstream outFile("leaders.csv");
+		if (!outFile) {
+			cerr << "Erreur d'écriture dans le fichier leaders.csv" << endl;
+			return leader;
+		}
+		for (const auto& l : lignes) {
+			outFile << l << endl;
+		}
+
+		outFile.close();
 
 		cout << joueur.getNom() << " a ete promu Leader de " << gym << " avec le badge " << badge << " !" << endl;
 		return leader;
+	}
+
+	static vector<LeaderGym> chargerLeaderGymdepuisFichier(const string& fichier, const map<string, Pokemon*>& pokedex) {
+		vector<LeaderGym> leaders;
+		ifstream inFile(fichier);
+		if (!inFile) {
+			cerr << "Erreur de lecture du fichier " << fichier << endl;
+			return leaders;
+		}
+		string ligne;
+		getline(inFile, ligne); 
+		while (getline(inFile, ligne)) {
+			stringstream ss(ligne);
+			string champ;
+			vector<string> champs;
+
+			while (getline(ss, champ, ',')) {
+				champs.push_back(champ);
+			}
+
+			if (champs.size() < 3) continue;
+
+			string nom = champs[0];
+			string nomGym = champs[1];
+			string badgeGym = champs[2];
+
+			vector<Pokemon*> equipe;
+			for (size_t i = 3; i < champs.size(); ++i) {
+				if (!champs[i].empty()) {
+					auto it = pokedex.find(champs[i]);
+					if (it != pokedex.end()) {
+						equipe.push_back(it->second);
+					}
+				}
+			}
+
+			LeaderGym leader(nom, equipe, badgeGym, nomGym);
+			leaders.push_back(leader);
+		}
 	}
 
 
@@ -347,34 +441,37 @@ public :
 	
 	//OK !
 	void GererEquipe() {
-		if (!joueurActif) {
+		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
+		if (!joueur) {
 			cout << "Aucun joueur actif ! Veuillez démarrer un jeu." << endl;
 			return;
 		}
 		cout << "=== GERER MON EQUIPE ===" << endl;
 		cout << "1) Afficher mes pokemons" << endl;
 		cout << "2) Soigner l'equipe" << endl;
-		cout << "3) Retour" << endl;
+		cout << "3) Changer l'ordre des pokemons" << endl;
+		cout << "4) Retour" << endl;
 		int choix;
 		cin >> choix;
-		if (choix < 1 || choix>5) {
-			do {
-				cout << "Choix invalide. Veuillez saisir un nombre entre 1 et 4" << endl;
-
-			} while (choix < 1 || choix>5);
-		}
-		switch (choix) {
-		case 1:
-			joueurActif->afficherEquipe();
-			break;
-		case 2:
-			joueurActif->soignerPokemon();
-			break;
-		case 3:
-			break;
-		default:
-			break;
-		}
+		do {
+			switch (choix) {
+			case 1:
+				joueur->afficherEquipe();
+				break;
+			case 2:
+				joueur->soignerPokemon();
+				break;
+			case 3:
+				joueur->changerOrdre();
+				updateJoueurDansFichier(*joueur, fichierJoueurs);
+				break;
+			case 4:
+				break;
+			default:
+				cout << "Choix invalide. Veuillez reessayer." << endl;
+				break;
+			}
+		} while (choix < 1 || choix > 4);
 	}
 
 	//OK !	
@@ -392,6 +489,7 @@ public :
 				AffronterJoueur();
 				break;
 			case 2:
+				AffronterGymnase();
 				break;
 			case 3:
 				break;
@@ -484,7 +582,6 @@ public :
 				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 				p1->attaquer(*p2);
 				p2->recevoirDegats(p1->calculerDegats(*p2));
-				//PauseConsole();
 
 				if (p2->estKo()) {
 					cout << p2->getNom() << " est KO !" << endl;
@@ -497,11 +594,10 @@ public :
 					cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 					p2->attaquer(*p1);
 					p1->recevoirDegats(p2->calculerDegats(*p1));
-					//PauseConsole();
+					
 
 					if (p1->estKo()) {
 						cout << p1->getNom() << " est KO !" << endl;
-						//PauseConsole();
 						scoreAdversaire++;
 						if (scoreAdversaire == 3) break;
 					}
@@ -512,12 +608,9 @@ public :
 				cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 				p2->attaquer(*p1);
 				p1->recevoirDegats(p2->calculerDegats(*p1));
-				//PauseConsole();
-
 				if (p1->estKo()) {
 					cout << p1->getNom() << " est KO !" << endl;
 					scoreAdversaire++;
-					//PauseConsole();
 					if (scoreAdversaire == 3) break;
 				}
 
@@ -526,12 +619,10 @@ public :
 					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 					p1->attaquer(*p2);
 					p2->recevoirDegats(p1->calculerDegats(*p2));
-					//PauseConsole();
 
 					if (p2->estKo()) {
 						cout << p2->getNom() << " est KO !" << endl;
 						scoreJoueur++;
-						//PauseConsole();
 						if (scoreJoueur == 3) break;
 					}
 				}
@@ -579,6 +670,149 @@ public :
 		else {
 			cout << "Le combat est terminé." << endl;
 		}
+
+	}
+
+	void AffronterGymnase() {
+		vector<string> nomLeaders;
+		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
+		ifstream inFile(fichierLeaders);
+		if (!inFile) {
+			cerr << "Erreur de lecture du fichier " << fichierLeaders << endl;
+			return;
+		}
+		string ligne;
+		getline(inFile, ligne);
+		while (getline(inFile, ligne)) {
+			stringstream ss(ligne);
+			string champ;
+			getline(ss, champ, ',');
+			if (!champ.empty()) {
+				nomLeaders.push_back(champ);
+			}
+		}
+		inFile.close();
+		cout << "=== Leaders disponibles ===" << endl;
+		for (const string& nom : nomLeaders) {
+			cout << "- " << nom << endl;
+		}
+		string nomLeader;
+		bool leaderTrouve = false;
+		do {
+			cout << "Quel leader voulez-vous affronter ? ";
+			cin >> nomLeader;
+
+			for (const string& nom : nomLeaders) {
+				if (nom == nomLeader) {
+					leaderTrouve = true;
+					break;
+				}
+			}
+
+			if (!leaderTrouve) {
+				cout << "Leader non trouvé. Veuillez réessayer." << endl;
+			}
+		} while (!leaderTrouve);
+		cout << "Vous allez affronter " << nomLeader << " !" << endl;
+		LeaderGym leader;
+		vector<LeaderGym> tousLesLeaders = chargerLeaderGymdepuisFichier(fichierLeaders, pokedex);
+		for (auto l : tousLesLeaders) {
+			if (l.getNom() == nomLeader) {
+				leader = l;
+				break;
+			}
+		}
+		int scoreJoueur = 0;
+		int scoreLeader = 0;
+		bool tourDuJoueur = rand() % 2 == 0;
+		int round = 1;
+		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
+		while (scoreJoueur < 3 && scoreLeader < 3) {
+			cout << "\n===== ROUND " << round << " =====" << endl;
+			Pokemon* p1 = joueur->getPokemonActif();
+			Pokemon* p2 = leader.getPokemonActif();
+
+			if (p1 == nullptr || p2 == nullptr) {
+				cout << "Un des joueurs n'a plus de Pokemon utilisables." << endl;
+				break;
+			}
+
+			if (tourDuJoueur) {
+				//joueur attaque
+				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
+				p1->attaquer(*p2);
+				p2->recevoirDegats(p1->calculerDegats(*p2));
+
+				if (p2->estKo()) {
+					cout << p2->getNom() << " est KO !" << endl;
+					scoreJoueur++;
+					if (scoreJoueur == 3) break;
+				}
+
+				//adversaire attaque (si son Pokémon n’est pas KO)
+				if (!p2->estKo()) {
+					cout << leader.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
+					p2->attaquer(*p1);
+					p1->recevoirDegats(p2->calculerDegats(*p1));
+
+					if (p1->estKo()) {
+						cout << p1->getNom() << " est KO !" << endl;
+						scoreLeader++;
+						if (scoreLeader == 3) break;
+					}
+				}
+			}
+			else {
+				//adversaire commence
+				cout << leader.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
+				p2->attaquer(*p1);
+				p1->recevoirDegats(p2->calculerDegats(*p1));
+
+				if (p1->estKo()) {
+					cout << p1->getNom() << " est KO !" << endl;
+					scoreLeader++;
+					if (scoreLeader == 3) break;
+				}
+				//joueur attaque (si son Pokémon n’est pas KO)
+				if (!p1->estKo()) {
+					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
+					p1->attaquer(*p2);
+					p2->recevoirDegats(p1->calculerDegats(*p2));
+
+					if (p2->estKo()) {
+						cout << p2->getNom() << " est KO !" << endl;
+						scoreJoueur++;
+						if (scoreJoueur == 3) break;
+					}
+				}
+			}
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << leader.getNom() << ": " << scoreLeader << endl;
+			PauseConsole();
+		}
+		cout << endl;
+		cout << "=== FIN DU COMBAT ===" << endl;
+		PauseConsole();
+		//fin du combat : on affiche les scores et qui a gagné
+		if (scoreJoueur == 3) {
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << leader.getNom() << ": " << scoreLeader << endl;
+			cout << joueur->getNom() << " a gagne le combat !" << endl;
+			cout << joueur->getNom() << " : Encore une nouvelle victoire ! " << endl;
+			cout << leader.getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
+			promouvoirEnLeaderGym(*joueur, leader.getNom());
+			joueur->ajouterCombatGagne();
+		}
+		else {
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << leader.getNom() << ": " << scoreLeader << endl;
+			cout << leader.getNom() << " a gagne le combat !" << endl;
+			cout << leader.getNom() << " : Encore une nouvelle victoire ! " << endl;
+			cout << joueur->getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
+			joueur->ajouterCombatPerdu();
+			updateJoueurDansFichier(*joueur, fichierJoueurs);
+		}
+		
 
 	}
 
