@@ -34,8 +34,15 @@ public :
 	//LES METHODES POUR GERER LES JOUEURS
 	static Joueur creerNouveauJoueur(const map<string, Pokemon*>& pokedex, const string& fichier) {
 		string nom;
-		cout << "Entrez le nom du joueur : ";
-		cin >> nom;
+
+		do {
+			cout << "Entrez le nom du joueur : ";
+			cin >> nom;
+			if (joueurExiste(nom, fichier)) {
+				cout << "\"" << nom << "\" est deja pris. Veuillez en choisir un autre." << endl;
+			}
+		} while (joueurExiste(nom, fichier));
+		
 
 		vector<string> badgesGagnes;
 		Joueur nouveau(nom, {}, badgesGagnes , 0, 0);
@@ -77,6 +84,30 @@ public :
 		cout << "Le joueur "<<nom<<" a ete cree avec succes !" << endl;
 		return nouveau;
 	}
+
+	static bool joueurExiste(const string& nom, const string& nomFichier) {
+		ifstream inFile(nomFichier);
+		if (!inFile) {
+			cerr << "Erreur d'ouverture du fichier " << nomFichier << endl;
+			return false;
+		}
+		string ligne;
+		while (getline(inFile, ligne)) {
+			istringstream iss(ligne);
+			string nomJoueur;
+			getline(iss, nomJoueur, ',');
+
+			if (nomJoueur == nom) {
+				inFile.close();
+				return true;
+			}
+
+		}
+		inFile.close();
+		return false;
+	}
+
+
 	
 	static void enregistrerJoueurDansFichier(Joueur& joueur, const string& nomFichier) {
 		ofstream outFile(nomFichier, ios::app);
