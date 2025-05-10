@@ -34,6 +34,10 @@ public:
 		cible.recevoirDegats(degats);
 	}
 
+	void afficherMessageInteraction() override {
+		cout << nom << ": \"Je ne suis pas suceptible... sauf quand il pleut.\"" << endl;
+	}
+
 	~PokemonFeu() override = default;
 
 };

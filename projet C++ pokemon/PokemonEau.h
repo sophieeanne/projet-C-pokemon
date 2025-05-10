@@ -43,6 +43,9 @@ public:
 		cible.recevoirDegats(degats);
 	}
 
+	void afficherMessageInteraction() override {
+		cout << nom << ": \"C est l heure de la baignade ou du combat ?\"" << endl;
+	}
 
 	~PokemonEau() override = default;
 	

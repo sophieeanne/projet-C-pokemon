@@ -125,8 +125,33 @@ public :
 
 
 	void interagirPokemon() {
+		int i = 0;
+		for (auto& pokemon : equipe) {
+			cout << i + 1 << " : " << pokemon->getNom() << endl;
+			i++;
+		}
 
+		int choix;
+		bool entreeValide = false;
+		while (!entreeValide) {
+			try {
+				cout << "Voici vos Pokemons, choisissez le numero de Pokemon avec qui vous voulez interagir : ";
+				cin >> choix;
+				if (cin.fail() || choix<1 || choix>equipe.size()) {
+					throw out_of_range("Choix invalide.");
+				}
+				entreeValide = true;
+			}
+			catch (const exception& e) {
+				cout << e.what() << "Veuillez reessayer." << endl;
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			}
+		}
+
+		equipe[choix - 1]->afficherMessageInteraction();
 	}
+
 	void interagirAdversaire() {
 
 	}

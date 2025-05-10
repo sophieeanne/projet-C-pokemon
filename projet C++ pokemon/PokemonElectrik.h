@@ -41,6 +41,10 @@ public:
 		cible.recevoirDegats(degats);
 	}
 
+	void afficherMessageInteraction() override {
+		cout << nom << ": \"Je suis en forme aujourd hui, comme une pile !\"" << endl;
+	}
+
 	~PokemonElectrik() override = default;
 	
 };

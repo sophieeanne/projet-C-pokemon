@@ -45,6 +45,7 @@ public:
 	//méthodes
 	virtual void attaquer(Pokemon& cible) = 0;
 	virtual int calculerDegats(Pokemon& cible) = 0;
+	virtual void afficherMessageInteraction() = 0;
 	virtual ~Pokemon() = default;
 	void recevoirDegats(int degats) { hp = hp - degats; }
 	void afficherInfos() {
