@@ -732,6 +732,8 @@ public :
 
 			updateJoueurDansFichier(*joueur, fichierJoueurs);
 			updateJoueurDansFichier(adversaire, fichierJoueurs);
+			//comptabiliser la victoire
+			joueurActif->ajouterAdversaireVaincu(adversaire.getNom());
 		}
 		else if (scoreAdversaire == 3) {
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
@@ -882,6 +884,8 @@ public :
 			cout << leader.getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
 			promouvoirEnLeaderGym(*joueur, leader.getNom());
 			joueur->ajouterCombatGagne();
+			//comptabiliser la victoire
+			joueurActif->ajouterAdversaireVaincu(leader.getNom());
 		}
 		else {
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur

@@ -16,7 +16,8 @@ public :
 	//constructeur
 	Entraineur(string Nom, vector<Pokemon*> Equipe) : nom(Nom), equipe(Equipe) {} 
 
-	//destructeur
+	virtual void ajouterAdversaireVaincu(const string& nomAdversaire) = 0;
+	//destructeur  
 	virtual ~Entraineur() = 0 {}
 	//setters
 	void setNom(string Nom) {
@@ -152,9 +153,7 @@ public :
 		equipe[choix - 1]->afficherMessageInteraction();
 	}
 
-	void interagirAdversaire() {
-
-	}
+	
 
 };
 class Joueur : public Entraineur
@@ -163,11 +162,13 @@ private:
 	vector<string> badges;
 	int combatsGagnes;
 	int combatsPerdus;
+	vector<string> adversairesVaincus;
+
 public:
 	//constructeur par défaut
-	Joueur() : Entraineur("", {}), badges(0), combatsGagnes(0), combatsPerdus(0) {} // Constructeur par défaut
+	Joueur() : Entraineur("", {}), badges(0), combatsGagnes(0), combatsPerdus(0), adversairesVaincus() {} // Constructeur par défaut
 	//constructeur
-	Joueur(string Nom, vector<Pokemon*> Equipe, vector<string> Badges, int CombatsGagnes, int CombatsPerdus) : Entraineur(Nom, Equipe), badges(Badges), combatsGagnes(CombatsGagnes), combatsPerdus(CombatsPerdus) {}
+	Joueur(string Nom, vector<Pokemon*> Equipe, vector<string> Badges, int CombatsGagnes, int CombatsPerdus) : Entraineur(Nom, Equipe), badges(Badges), combatsGagnes(CombatsGagnes), combatsPerdus(CombatsPerdus), adversairesVaincus() {}
 
 	//setters
 	void setBadges(vector<string> Badges) {
@@ -178,6 +179,9 @@ public:
 	}
 	void setCombatsPerdus(int CombatsPerdus) {
 		combatsPerdus = CombatsPerdus;
+	}
+	void setAdversairesVaincus(vector<string> Adversaires) {
+		adversairesVaincus = Adversaires;
 	}
 	//getters
 	vector<string> getBadges() {
@@ -191,6 +195,9 @@ public:
 	}
 	int nbBadges() {
 		return badges.size();
+	}
+	vector<string> getAdversairesVaincus() const {
+		return adversairesVaincus;
 	}
 
 	//méthodes
@@ -218,6 +225,67 @@ public:
 	void ajouterCombatPerdu() {
 		combatsPerdus++;
 	}
+
+	void ajouterAdversaireVaincu(const string& nomAdversaire) override{
+		if (find(adversairesVaincus.begin(), adversairesVaincus.end(), nomAdversaire) == adversairesVaincus.end()) {
+			adversairesVaincus.push_back(nomAdversaire);
+			cout << nomAdversaire << " ajoute a la liste des adversaires vaincus." << endl;
+		}
+	}
+
+	void interagirAdversaire() {
+		if (adversairesVaincus.empty()) {
+			cout << "Vous n avez vaincu aucun adversaire pour l instant." << endl;
+			return;
+		}
+
+		cout << "=== ADVERSAIRES VAINCUS ===" << endl;
+		for (size_t i = 0; i < adversairesVaincus.size(); ++i) {
+			cout << i + 1 << ") " << adversairesVaincus[i] << endl;
+		}
+
+		int choix;
+		bool entreeValide = false;
+		while (!entreeValide) {
+			try {
+				cout << "Voici vos adversaires vaincus, choisissez le numero avec qui vous voulez interagir : ";
+				cin >> choix;
+				if (cin.fail() || choix<1 || choix>equipe.size()) {
+					throw out_of_range("Choix invalide.");
+				}
+				entreeValide = true;
+			}
+			catch (const exception& e) {
+				cout << e.what() << "Veuillez reessayer." << endl;
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			}
+		}
+
+		string nomAdversaire = adversairesVaincus[choix - 1];
+		//messages des Leaders
+		if (nomAdversaire == "Ignis") {
+			cout << "Ignis: \"La flamme de la defaite brule encore en moi...\"" << endl;
+		}
+		else if (nomAdversaire == "Aqua") {
+			cout << "Aqua: \"Les vagues de ton talent m ont submerge !\"" << endl;
+		}
+		else if (nomAdversaire == "Volt") {
+			cout << "Volt: \"Je dois admettre que tu as ete... electrisant !\"" << endl;
+		}
+		else if (nomAdversaire == "Flora") {
+			cout << "Flora: \"Meme la plus forte des plantes flechit devant toi!\"" << endl;
+		}
+		//message du maitre
+		/*else if (nomAdversaire == "") {
+
+		}*/
+		//message d un joueur (le meme pour tous)
+		else {
+			cout << nomAdversaire << ":\"Tu m as bien battu ! A la prochaine, pour la revanche !\"" << endl;
+		}
+	}
+
 };
 class LeaderGym : public Entraineur
 {
@@ -252,6 +320,10 @@ public:
 		cout << "=== STATISTIQUES ===" << endl;
 		cout << "Badge : " << badgeGym << endl;
 		cout << "Nom du gymnase : " << nomGym << endl;
+	}
+
+	void ajouterAdversaireVaincu(const string& nomAdversaire) override {
+		
 	}
 };
 
