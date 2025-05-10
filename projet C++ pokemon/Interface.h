@@ -446,7 +446,8 @@ public :
 		cout << "1) Gerer mon equipe" << endl;
 		cout << "2) Combattre" << endl;
 		cout << "3) Statistiques" << endl;
-		cout << "4) Quitter" << endl;
+		cout << "4) Interagir" << endl;
+		cout << "5) Quitter" << endl;
 		int choix;
 		bool entreeValide = false;
 
@@ -460,7 +461,7 @@ public :
 					throw invalid_argument("Choix invalide, la saisie doit etre un entier.");
 				}
 				choix = stoi(saisie);
-				if (choix < 1 || choix > 4) {
+				if (choix < 1 || choix > 5) {
 					throw out_of_range("Choix invalide, la saisie doit etre dans les options proposees.");
 				}
 				entreeValide = true;
@@ -481,6 +482,9 @@ public :
 			Statistiques();
 			break;
 		case 4:
+			Interagir();
+			break;
+		case 5:
 			cout << "Au revoir !" << endl;
 			break;
 		}
@@ -902,6 +906,49 @@ public :
 			cout << "Aucun joueur actif !" << endl;
 		}
 	}
+
+
+
+	void Interagir() {
+		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
+		cout << "=== INTERAGIR ===" << endl;
+		cout << "1) Avec mes Pokemons" << endl;
+		cout << "2) Avec un adversaire vaincu" << endl;
+
+		int choix;
+		bool entreeValide = false;
+
+		while (!entreeValide) {
+			try {
+				string saisie;
+				cin >> saisie;
+
+				if (!all_of(saisie.begin(), saisie.end(), ::isdigit)) {
+					throw invalid_argument("Choix invalide, la saisie doit etre un entier.");
+				}
+				choix = stoi(saisie);
+				if (choix < 1 || choix > 2) {
+					throw out_of_range("Choix invalide, la saisie doit etre dans les options proposees.");
+				}
+				entreeValide = true;
+			}
+			catch (const exception& e) {
+				cout << e.what() << " Veuillez reessayer." << endl;
+			}
+		}
+
+		switch (choix) {
+		case 1:
+			joueur->interagirPokemon();
+			break;
+		case 2:
+			joueur->interagirAdversaire();
+			break;
+		}
+
+
+	}
+
 
 	//OK !
 	void PauseConsole() {

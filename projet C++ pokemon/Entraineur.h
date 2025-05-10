@@ -122,6 +122,15 @@ public :
 		}
 		
 	}
+
+
+	void interagirPokemon() {
+
+	}
+	void interagirAdversaire() {
+
+	}
+
 };
 class Joueur : public Entraineur
 {
