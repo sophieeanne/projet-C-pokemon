@@ -366,7 +366,7 @@ public:
 			try {
 				cout << "Voici vos adversaires vaincus, choisissez le numero avec qui vous voulez interagir : ";
 				cin >> choix;
-				if (cin.fail() || choix<1 || choix>equipe.size()) {
+				if (cin.fail() || choix<1 || choix>adversairesVaincus.size()) {
 					throw out_of_range("Choix invalide.");
 				}
 				entreeValide = true;
