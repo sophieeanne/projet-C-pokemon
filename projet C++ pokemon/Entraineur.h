@@ -31,37 +31,56 @@ public :
 		return equipe;
 	}
 
-	//méthodes
+	/// <summary>
+	/// La méthode ajouterPokemon permet d'ajouter un Pokemon à l'équipe de l'entraîneur.
+	/// </summary>
+	/// <param name="nomPokemon">le nom du pokemon</param>
+	/// <param name="pokedex">Le pokedex</param>
 	void ajouterPokemon(const string& nomPokemon, const map<string, Pokemon*>& pokedex) {
 		auto it = pokedex.find(nomPokemon);
 		equipe.push_back(it->second);
 		cout << nomPokemon << " a ete ajoute a l'equipe !" << endl;
 	}
 
+	/// <summary>
+	/// Pour afficher l'équipe de l'entraîneur.
+	/// </summary>
 	void afficherEquipe() {
 		cout << "=== MON EQUIPE ===" << endl;
 		for (int i = 0; i < equipe.size(); i++) {
 			equipe[i]->afficherInfos();
 		}
 	}
+	/// <summary>
+	/// Vérifie si l'équipe de l'entraîneur est pleine (6 Pokémon maximum).
+	/// </summary>
+	/// <returns>True si elle est pleine, false sinon</returns>
 	bool equipePleine() {
 		if (equipe.size() >= 6) {
 			return true;
 		}
 		return false;
 	}
+	/// <summary>
+	/// Recupere le pokemon actif pour voir si il est en etat de se battre.
+	/// </summary>
+	/// <returns>Le pokemon s'il n'est pas KO, un pointeur null si tous les pokemons sont ko</returns>
 	Pokemon* getPokemonActif() {
 		for (auto& pokemon : equipe) {
 			if (!pokemon->estKo()) {
 				return pokemon;
 			}
 		}
-		return nullptr; // Tous les Pokémon sont KO
+		return nullptr; //tous les pokemons sont KO
 	}
+
+	/// <summary>
+	/// Méthode pour soigner les Pokémon de l'équipe de l'entraîneur.
+	/// </summary>
 	void soignerPokemon() {
 		for (auto& pokemon : equipe) {
 			if (pokemon->estKo()) {
-				pokemon->setHp(100); // Remettre les HP à 100
+				pokemon->setHp(pokemon->getHpMax()); //remettre les HP à leur maximum
 				cout << pokemon->getNom() << " a ete soigne !" << endl;
 			}
 			else {
@@ -71,6 +90,9 @@ public :
 		cout << "Tous les Pokemon sont en bonne sante !" << endl;
 	}
 
+	/// <summary>
+	///	Methode pour changer l'ordre des Pokémon dans l'équipe de l'entraîneur.
+	/// </summary>
 	void changerOrdre() {
 		int i = 0;
 		for (auto& pokemon : equipe) {
@@ -124,7 +146,9 @@ public :
 		
 	}
 
-
+	/// <summary>
+	/// Méthode pour interagir avec un Pokémon de l'équipe de l'entraîneur.
+	/// </summary>
 	void interagirPokemon() {
 		int i = 0;
 		for (auto& pokemon : equipe) {
@@ -200,7 +224,9 @@ public:
 		return adversairesVaincus;
 	}
 
-	//méthodes
+	/// <summary>
+	/// Cette fonction affiche les statistques du joueur (nombre de badges, combats gagnés et perdus).
+	/// </summary>
 	void afficherStatistiques() {
 		cout << "=== STATISTIQUES ===" << endl;
 		cout << "Badges : " << nbBadges() << endl;
@@ -208,6 +234,10 @@ public:
 		cout << "Combats perdus : " << combatsPerdus << endl;
 	}
 
+	/// <summary>
+	/// La fonction ajoute le badge du joueur.
+	/// </summary>
+	/// <param name="badge">L enom du badge gagné</param>
 	void ajouterBadge(string badge) {
 		auto it = find(badges.begin(), badges.end(), badge);
 		if (it == badges.end()) {
@@ -219,21 +249,107 @@ public:
 		}
 	}
 
+	/// <summary>
+	/// Ajouter un combat gagné
+	/// </summary>
 	void ajouterCombatGagne() {
 		combatsGagnes++;
 	}
+	/// <summary>
+	/// Ajouter un combat perdu
+	/// </summary>
 	void ajouterCombatPerdu() {
 		combatsPerdus++;
 	}
 
+	/// <summary>
+	/// Ajouter un adversaire vaincu à la liste des adversaires vaincus.
+	/// </summary>
+	/// <param name="nomAdversaire">Nom de l'adversaire</param>
 	void ajouterAdversaireVaincu(const string& nomAdversaire) override{
 		if (find(adversairesVaincus.begin(), adversairesVaincus.end(), nomAdversaire) == adversairesVaincus.end()) {
 			adversairesVaincus.push_back(nomAdversaire);
-			cout << nomAdversaire << " ajoute a la liste des adversaires vaincus." << endl;
+			cout << nomAdversaire << " ajoute a la liste des adversaires vaincus de " << nom << endl;
 		}
 	}
 
+	/// <summary>
+	/// Méthode pour charger la liste des adversaires vaincus depuis un fichier.
+	/// </summary>
+	/// <param name="nomFichier">Nom du fichier</param>
+	/// <param name="nomJoueur">Nom du joueur</param>
+	void chargerAdversairesVaincus(const string& nomFichier, const string& nomJoueur) {
+		ifstream in(nomFichier);
+		string ligne;
+		while (getline(in, ligne)) {
+			stringstream ss(ligne);
+			string champ;
+			vector<string> champs;
+			while (getline(ss, champ, ',')) {
+				champs.push_back(champ);
+			}
+			if (!champs.empty() && champs[0] == nomJoueur) {
+				adversairesVaincus.assign(champs.begin() + 1, champs.end());
+				break;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Methode pour sauvegarder un adversaire vaincu dans un fichier.
+	/// </summary>
+	/// <param name="nomJoueur">Nom du joueur qui a gagné</param>
+	/// <param name="adversaire">Nom de l'adversaire qui a perdu</param>
+	/// <param name="nomFichier">Nom du fichier</param>
+	void sauvegarderAdversaireVaincu(const string& nomJoueur, const string& adversaire, const string& nomFichier) {
+		ifstream inFile(nomFichier);
+		vector<string> lignes;
+		bool joueurTrouve = false;
+
+		string ligne;
+		while (getline(inFile, ligne)) {
+			stringstream ss(ligne);
+			string champ;
+			vector<string> champs;
+
+			while (getline(ss, champ, ',')) {
+				champs.push_back(champ);
+			}
+
+			if (!champs.empty() && champs[0] == nomJoueur) {
+				joueurTrouve = true;
+				if (find(champs.begin() + 1, champs.end(), adversaire) == champs.end()) {
+					champs.push_back(adversaire);  
+				}
+			}
+
+			string nouvelleLigne;
+			for (size_t i = 0; i < champs.size(); ++i) {
+				nouvelleLigne += champs[i];
+				if (i != champs.size() - 1) nouvelleLigne += ",";
+			}
+			lignes.push_back(nouvelleLigne);
+		}
+		inFile.close();
+
+		if (!joueurTrouve) {
+			lignes.push_back(nomJoueur + "," + adversaire);
+		}
+
+		ofstream outFile(nomFichier);
+		for (const auto& l : lignes) {
+			outFile << l << endl;
+		}
+		outFile.close();
+	}
+
+
+
+	/// <summary>
+	/// Méthode pour interagir avec un adversaire vaincu.
+	/// </summary>
 	void interagirAdversaire() {
+		chargerAdversairesVaincus("joueurs_vaincus.txt", nom); 
 		if (adversairesVaincus.empty()) {
 			cout << "Vous n avez vaincu aucun adversaire pour l instant." << endl;
 			return;
@@ -277,9 +393,9 @@ public:
 			cout << "Flora: \"Meme la plus forte des plantes flechit devant toi!\"" << endl;
 		}
 		//message du maitre
-		/*else if (nomAdversaire == "") {
-
-		}*/
+		else if (nomAdversaire == "Regis") {
+			cout << "Regis: \"Tu es un vrai maitre Pokemon ! Bravo !\"" << endl;
+		}
 		//message d un joueur (le meme pour tous)
 		else {
 			cout << nomAdversaire << ":\"Tu m as bien battu ! A la prochaine, pour la revanche !\"" << endl;
@@ -315,13 +431,19 @@ public:
 		return nomGym;
 	}
 
-	//méthodes
+	/// <summary>
+	/// Méthode pour afficher les statistiques du gymnase.
+	/// </summary>
 	void afficherInfosGymnase() {
 		cout << "=== STATISTIQUES ===" << endl;
 		cout << "Badge : " << badgeGym << endl;
 		cout << "Nom du gymnase : " << nomGym << endl;
 	}
 
+	/// <summary>
+	/// Méthode pour interagir avec un adversaire vaincu (ne sert pas ici)
+	/// </summary>
+	/// <param name="nomAdversaire"></param>
 	void ajouterAdversaireVaincu(const string& nomAdversaire) override {
 		
 	}
@@ -337,10 +459,19 @@ public :
 	//destructeur
 	~MaitrePokemon() {}
 
-	//méthode
+	/// <summary>
+	/// Méthode pour calculer les dégâts infligés par le Maitre Pokemon avec le bonus de 25%.
+	/// </summary>
+	/// <param name="degat">Le degat fait</param>
+	/// <returns>Le nouveau degat avec le bonus</returns>
 	double appliquerBonus(double degat) {
-		return degat * 2.5;
+		return degat = degat * 1.25;
 	}
+
+	/// <summary>
+	/// Méthode pour ajouter les adversaires vaincus (ne sert pas ici)
+	/// </summary>
+	/// <param name="nomAdversaire"></param>
 	void ajouterAdversaireVaincu(const string& nomAdversaire) override {
 	}
 };

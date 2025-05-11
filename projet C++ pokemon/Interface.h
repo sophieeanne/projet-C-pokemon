@@ -7,8 +7,11 @@ using namespace std;
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <thread>    
+#include <chrono>     
 #include "Pokemon.h"
 #include "Entraineur.h"
+
 class Interface
 {
 public :
@@ -19,6 +22,7 @@ public :
 	string fichierJoueurs = "joueur.csv";
 	string fichierLeaders = "leaders.csv";
 	string fichierMaitres = "maitres.csv";
+	string listes_battus = "joueurs_vaincus.txt";
 
 	//constructeur par défaut
 	Interface() : joueurActif(nullptr) {}
@@ -33,6 +37,13 @@ public :
 	}
 	
 	//LES METHODES POUR GERER LES JOUEURS
+
+	/// <summary>
+	/// Méthode pour créer un nouveau joueur.
+	/// </summary>
+	/// <param name="pokedex">Le pokedex</param>
+	/// <param name="fichier">Le nom du fichier (ici le fichier joueurs)</param>
+	/// <returns>Un objet joueur</returns>
 	static Joueur creerNouveauJoueur(const map<string, Pokemon*>& pokedex, const string& fichier) {
 		string nom;
 
@@ -86,6 +97,12 @@ public :
 		return nouveau;
 	}
 
+	/// <summary>
+	/// Méthode pour vérifier si un joueur existe déjà dans le fichier.
+	/// </summary>
+	/// <param name="nom">Le nom du joueur</param>
+	/// <param name="nomFichier">Nom du fichier</param>
+	/// <returns>Vrai si le joueur existe, faux sinon</returns>
 	static bool joueurExiste(const string& nom, const string& nomFichier) {
 		ifstream inFile(nomFichier);
 		if (!inFile) {
@@ -108,8 +125,11 @@ public :
 		return false;
 	}
 
-
-	
+	/// <summary>
+	/// Methode pour enregistrer un joueur dans un fichier CSV.
+	/// </summary>
+	/// <param name="joueur">L'objet joueur</param>
+	/// <param name="nomFichier">Le nom du fichier</param>
 	static void enregistrerJoueurDansFichier(Joueur& joueur, const string& nomFichier) {
 		ofstream outFile(nomFichier, ios::app);
 		if (!outFile) {
@@ -147,6 +167,12 @@ public :
 		outFile.close();
 	}
 
+	/// <summary>
+	/// Méthode pour charger les joueurs depuis un fichier CSV.
+	/// </summary>
+	/// <param name="nomFichier">Le nom du fichier</param>
+	/// <param name="pokedex">Le pokedex</param>
+	/// <returns>Un vecteur avec tous les objets joueurs qui existent</returns>
 	static vector<Joueur> chargerJoueursDepuisFichier(const string& nomFichier, const map<string, Pokemon*>& pokedex) {
 		vector<Joueur> joueurs;
 		ifstream inFile(nomFichier);
@@ -211,6 +237,12 @@ public :
 		return joueurs;
 	}
 
+	/// <summary>
+	/// Methode pour choisir le joueur actif de la partie
+	/// </summary>
+	/// <param name="fichierJoueurs">Nom du fichier</param>
+	/// <param name="pokedex">Le pokedex</param>
+	/// <returns>Un pointeur du Joueur</returns>
 	static unique_ptr<Joueur> choisirJoueurActif(const string& fichierJoueurs, const map<string, Pokemon*>& pokedex) {
 		cout << "Saisissez votre pseudo : ";
 		string pseudo;
@@ -228,6 +260,11 @@ public :
 		return nullptr;
 	}
 
+	/// <summary>
+	/// Methode pour actualiser les informations du joueur dans le fichier CSV.
+	/// </summary>
+	/// <param name="joueur">Le nom du joueur</param>
+	/// <param name="nomFichier">Le nom du fichier</param>
 	static void updateJoueurDansFichier(Joueur& joueur, const string& nomFichier) {
 		ifstream inFile(nomFichier);
 		if (!inFile) {
@@ -303,6 +340,13 @@ public :
 
 
 	//LES METHODES POUR GERER LES LEADERSGYM
+
+	/// <summary>
+	/// Méthode pour promouvoir un joueur en Leader de Gym.
+	/// </summary>
+	/// <param name="joueur">L'objet joueur qui a vaincu</param>
+	/// <param name="leaderBattu">Le nom du leader battu</param>
+	/// <returns>Le joueur devenu leader</returns>
 	LeaderGym promouvoirEnLeaderGym(Joueur& joueur, const string& leaderBattu) {
 		map<string, int> typeCounts;
 
@@ -397,6 +441,12 @@ public :
 		return leader;
 	}
 
+	/// <summary>
+	/// Methode pour charger les leaders de gym depuis un fichier CSV.
+	/// </summary>
+	/// <param name="fichier">Le nom du fichier (leaders.csv)</param>
+	/// <param name="pokedex">Le pokedex</param>
+	/// <returns>Un vecteur de tous les leaders qui existent</returns>
 	static vector<LeaderGym> chargerLeaderGymdepuisFichier(const string& fichier, const map<string, Pokemon*>& pokedex) {
 		vector<LeaderGym> leaders;
 		ifstream inFile(fichier);
@@ -436,7 +486,14 @@ public :
 		}
 	}
 
+
 	//LES METHODES POUR GERER LES MAITRES POKEMON 
+
+	/// <summary>
+	/// Methode pour charger les maitres pokemons depuis un fichier CSV.
+	/// </summary>
+	/// <param name="nomFichier">Le nom du fichier (maitres.csv)</param>
+	/// <returns>Un vecteur avec chaque leader</returns>
 	vector<MaitrePokemon> chargerMaitresDepuisFichier(const string& nomFichier) {
 		vector<MaitrePokemon> maitres;
 		ifstream fichier(nomFichier);
@@ -479,9 +536,9 @@ public :
 	}
 
 
-
-
-	//LE MENU PRINCIPAL
+	/// <summary>
+	///	Le menu principal
+	/// </summary>
 	void Menu() {
 		int choix = 0;
 		do {
@@ -535,7 +592,9 @@ public :
 		} while (choix != 5);
 	}
 	
-	//OK !
+	/// <summary>
+	/// L'option gerer mon équipe du menu principal
+	/// </summary>
 	void GererEquipe() {
 		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
 		if (!joueur) {
@@ -584,7 +643,9 @@ public :
 		}
 	}
 
-	//OK !	
+	/// <summary>
+	/// L'option combattre du menu principal
+	/// </summary>
 	void Combattre() {
 		cout << "=== COMBATTRE ===" << endl;
 		cout << "1) Affronter un joueur" << endl;
@@ -628,7 +689,9 @@ public :
 			}
 	}
 
-	//OK ! 
+	/// <summary>
+	/// Le combat entre le joueur et un autre joueur
+	/// </summary>
 	void AffronterJoueur() {
 		vector<string> nomsJoueurs;
 		ifstream inFile(fichierJoueurs);
@@ -708,6 +771,7 @@ public :
 				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 				p1->attaquer(*p2);
 				p2->recevoirDegats(p1->calculerDegats(*p2));
+				this_thread::sleep_for(chrono::seconds(3));
 
 				if (p2->estKo()) {
 					cout << p2->getNom() << " est KO !" << endl;
@@ -720,7 +784,7 @@ public :
 					cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 					p2->attaquer(*p1);
 					p1->recevoirDegats(p2->calculerDegats(*p1));
-					
+					this_thread::sleep_for(chrono::seconds(3));
 
 					if (p1->estKo()) {
 						cout << p1->getNom() << " est KO !" << endl;
@@ -734,6 +798,8 @@ public :
 				cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 				p2->attaquer(*p1);
 				p1->recevoirDegats(p2->calculerDegats(*p1));
+				this_thread::sleep_for(chrono::seconds(3));
+
 				if (p1->estKo()) {
 					cout << p1->getNom() << " est KO !" << endl;
 					scoreAdversaire++;
@@ -744,6 +810,7 @@ public :
 					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 					p1->attaquer(*p2);
 					p2->recevoirDegats(p1->calculerDegats(*p2));
+					this_thread::sleep_for(chrono::seconds(3));
 
 					if (p2->estKo()) {
 						cout << p2->getNom() << " est KO !" << endl;
@@ -780,6 +847,7 @@ public :
 
 			//comptabiliser la victoire
 			joueurActif->ajouterAdversaireVaincu(adversaire.getNom());
+			joueur->sauvegarderAdversaireVaincu(joueur->getNom(), adversaire.getNom(), listes_battus);
 		}
 		else if (scoreAdversaire == 3) {
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
@@ -794,6 +862,10 @@ public :
 
 			updateJoueurDansFichier(*joueur, fichierJoueurs);
 			updateJoueurDansFichier(adversaire, fichierJoueurs);
+
+			//comptabiliser la victoire
+			adversaire.ajouterAdversaireVaincu(joueur->getNom());
+			adversaire.sauvegarderAdversaireVaincu(adversaire.getNom(),joueur->getNom(), listes_battus);
 		}
 		else {
 			cout << "Le combat est terminé." << endl;
@@ -801,6 +873,9 @@ public :
 
 	}
 
+	/// <summary>
+	/// Le combat entre le joueur et un leader de gym
+	/// </summary>
 	void AffronterGymnase() {
 		vector<string> nomLeaders;
 		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
@@ -871,6 +946,7 @@ public :
 				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 				p1->attaquer(*p2);
 				p2->recevoirDegats(p1->calculerDegats(*p2));
+				this_thread::sleep_for(chrono::seconds(3));
 
 				if (p2->estKo()) {
 					cout << p2->getNom() << " est KO !" << endl;
@@ -883,6 +959,7 @@ public :
 					cout << leader.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 					p2->attaquer(*p1);
 					p1->recevoirDegats(p2->calculerDegats(*p1));
+					this_thread::sleep_for(chrono::seconds(3));
 
 					if (p1->estKo()) {
 						cout << p1->getNom() << " est KO !" << endl;
@@ -896,6 +973,7 @@ public :
 				cout << leader.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 				p2->attaquer(*p1);
 				p1->recevoirDegats(p2->calculerDegats(*p1));
+				this_thread::sleep_for(chrono::seconds(3));
 
 				if (p1->estKo()) {
 					cout << p1->getNom() << " est KO !" << endl;
@@ -907,6 +985,7 @@ public :
 					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 					p1->attaquer(*p2);
 					p2->recevoirDegats(p1->calculerDegats(*p2));
+					this_thread::sleep_for(chrono::seconds(3));
 
 					if (p2->estKo()) {
 						cout << p2->getNom() << " est KO !" << endl;
@@ -941,6 +1020,7 @@ public :
 
 			//comptabiliser la victoire
 			joueurActif->ajouterAdversaireVaincu(leader.getNom());
+			joueur->sauvegarderAdversaireVaincu(joueur->getNom(), leader.getNom(), listes_battus);
 		}
 		else {
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
@@ -957,6 +1037,9 @@ public :
 
 	}
 
+	/// <summary>
+	/// Le combat entre le joueur et le Maitre Pokemon
+	/// </summary>
 	void AffronterMaitrePokemon() {
 		if (!joueurActif) {
 			cout << "Aucun joueur actif !" << endl;
@@ -978,6 +1061,7 @@ public :
 		//on choisi un maitre pokemon au hasard
 		srand(time(0));
 		int index = rand() % maitres.size();
+
 		MaitrePokemon adversaire = maitres[index];
 		cout << "Vous allez affronter " << adversaire.getNom() << " !" << endl;
 		int scoreJoueur = 0;
@@ -1002,6 +1086,7 @@ public :
 				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 				p1->attaquer(*p2);
 				p2->recevoirDegats(p1->calculerDegats(*p2));
+				this_thread::sleep_for(chrono::seconds(3));
 
 				if (p2->estKo()) {
 					cout << p2->getNom() << " est KO !" << endl;
@@ -1013,7 +1098,10 @@ public :
 				if (!p2->estKo()) {
 					cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 					p2->attaquer(*p1);
-					p1->recevoirDegats(p2->calculerDegats(*p1));
+					double bonus = adversaire.appliquerBonus(p2->calculerDegats(*p1));
+					p1->recevoirDegats(bonus*1.25);
+
+					this_thread::sleep_for(chrono::seconds(3));
 
 
 					if (p1->estKo()) {
@@ -1027,7 +1115,10 @@ public :
 				//adversaire commence
 				cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
 				p2->attaquer(*p1);
-				p1->recevoirDegats(p2->calculerDegats(*p1));
+				double bonus = adversaire.appliquerBonus(p2->calculerDegats(*p1));
+				p1->recevoirDegats(bonus*1.25);
+				this_thread::sleep_for(chrono::seconds(3));
+
 				if (p1->estKo()) {
 					cout << p1->getNom() << " est KO !" << endl;
 					scoreAdversaire++;
@@ -1039,6 +1130,7 @@ public :
 					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 					p1->attaquer(*p2);
 					p2->recevoirDegats(p1->calculerDegats(*p2));
+					this_thread::sleep_for(chrono::seconds(3));
 
 					if (p2->estKo()) {
 						cout << p2->getNom() << " est KO !" << endl;
@@ -1069,8 +1161,10 @@ public :
 
 			joueur->ajouterCombatGagne();
 			updateJoueurDansFichier(*joueur, fichierJoueurs);
+
 			//comptabiliser la victoire
 			joueurActif->ajouterAdversaireVaincu(adversaire.getNom());
+			joueur->sauvegarderAdversaireVaincu(joueur->getNom(), adversaire.getNom(), listes_battus);
 		}
 		else if (scoreAdversaire == 3) {
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
@@ -1090,7 +1184,9 @@ public :
 
 	}
 
-	//OK !
+	/// <summary>
+	/// Afficher les statistiques du joueur actif
+	/// </summary>
 	void Statistiques() {
 		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
 		if (joueur) {
@@ -1101,6 +1197,9 @@ public :
 		}
 	}
 
+	/// <summary>
+	/// L'option pour interagir avec les pokémons ou un adversaire vaincu
+	/// </summary>
 	void Interagir() {
 		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
 		cout << "=== INTERAGIR ===" << endl;
@@ -1141,7 +1240,9 @@ public :
 
 	}
 
-	//OK !
+	/// <summary>
+	/// Methode pour mettre en pause la console
+	/// </summary>
 	void PauseConsole() {
 		cout << "Appuyez sur une touche pour continuer..." << endl;
 		cin.ignore();

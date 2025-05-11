@@ -5,7 +5,11 @@
 #include "PokemonEau.h"
 #include "PokemonElectrik.h"
 
-// Charger les Pokémon depuis un fichier CSV
+/// <summary>
+/// Charger les pokemons depuis un fichier CSV.
+/// </summary>
+/// <param name="fichierNom">Le nom du fichier</param>
+/// <returns>Une map avec le nom du pokemon, et l'objet pokemon</returns>
 map<string, Pokemon*> chargerPokemonDepuisFichier(const string& fichierNom) {
 	map<string, Pokemon*> pokedex;
 	ifstream fichier(fichierNom);
@@ -46,7 +50,10 @@ map<string, Pokemon*> chargerPokemonDepuisFichier(const string& fichierNom) {
 	return pokedex;
 }
 
-//afficher le pokedex (le résultat est long, c'est juste pour tester)
+/// <summary>
+/// Méthode pour afficher le pokedex.
+/// </summary>
+/// <param name="pokedex"></param>
 void afficherPokedex(const map<string, Pokemon*>& pokedex) {
     cout << "=== POKEDEX ===" << endl;
     for (const auto& pair : pokedex) {
@@ -66,11 +73,13 @@ void afficherPokedex(const map<string, Pokemon*>& pokedex) {
 }
 
 
+
 int main()
 {
     //initialisaton de tous les fichiers et attributs nécessaires
 	string pokemonFichier = "pokemon.csv";
 	string nomFichier = "joueur.csv";
+	string liste_vaincus = "joueurs_vaincus.txt";
     map<string, Pokemon*> pokedex = chargerPokemonDepuisFichier(pokemonFichier);
 
 	// ouvrir le fichier en lecture/écriture
@@ -81,7 +90,6 @@ int main()
 	}
 
 	//afficherPokedex(pokedex);
-
 
 	unique_ptr<Entraineur> ja = nullptr;
 	Interface interface(nomFichier, pokemonFichier, pokedex, nullptr);
@@ -144,18 +152,9 @@ int main()
 		} while (!ja);
 
 	}
+
 	interface.setJoueurActif(move(ja));
 	interface.Menu();
-
-
-	
-
-
-	
-
-
-
-
 
 	
 }

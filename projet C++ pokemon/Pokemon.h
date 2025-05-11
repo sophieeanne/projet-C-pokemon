@@ -18,10 +18,11 @@ protected:
     int hp;
 	map<string, int> attaques;
     string faiblesse;
+	int hpMax;
 
 public:
 	Pokemon() : nom(""), type1(""), type2(""), hp(0) {} // Constructeur par défaut
-	Pokemon(string Nom, string t1, string t2, int Hp, string nomAttaque, int Degat) : nom(Nom), type1(t1), type2(t2), hp(Hp){
+	Pokemon(string Nom, string t1, string t2, int Hp, string nomAttaque, int Degat) : nom(Nom), type1(t1), type2(t2), hp(Hp), hpMax(Hp){
 		attaques[nomAttaque] = Degat;
 	}
 	//~Pokemon() {} // Destructeur
@@ -32,6 +33,7 @@ public:
 	void setHp(int Hp) { hp = Hp;}
 	void setAttaque(string nomAttaque, int Degat) {attaques[nomAttaque] = Degat;}
 	void setFaiblesse(string Faiblesse) {faiblesse = Faiblesse;}
+	void setHpMax(int nvHp) { hpMax = nvHp; }
 
 	//getters
 	string getNom() const {return nom;}
@@ -42,6 +44,10 @@ public:
 	const map<string, int>& getAttaques() const {
 		return attaques;
 	}	
+	int getHpMax() const { return hpMax; }
+	
+	
+
 	//méthodes
 	virtual void attaquer(Pokemon& cible) = 0;
 	virtual int calculerDegats(Pokemon& cible) = 0;
