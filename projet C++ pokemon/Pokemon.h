@@ -21,11 +21,11 @@ protected:
 	int hpMax;
 
 public:
-	Pokemon() : nom(""), type1(""), type2(""), hp(0) {} // Constructeur par défaut
+	//Constructeurs
+	Pokemon() : nom(""), type1(""), type2(""), hp(0) {} 
 	Pokemon(string Nom, string t1, string t2, int Hp, string nomAttaque, int Degat) : nom(Nom), type1(t1), type2(t2), hp(Hp), hpMax(Hp){
 		attaques[nomAttaque] = Degat;
 	}
-	//~Pokemon() {} // Destructeur
 
 	//setters
 	void setNom(string Nom) { nom = Nom; }
@@ -53,7 +53,16 @@ public:
 	virtual int calculerDegats(Pokemon& cible) = 0;
 	virtual void afficherMessageInteraction() = 0;
 	virtual ~Pokemon() = default;
+
+	/// <summary>
+	/// Méthode qui décrémente les points de vie d'un pokémon lors qu'il est attaqué
+	/// </summary>
+	/// <param name="degats">le degat fait</param>
 	void recevoirDegats(int degats) { hp = hp - degats; }
+
+	/// <summary>
+	/// Méthode qui affiche les informations d'un pokémon
+	/// </summary>
 	void afficherInfos() {
 		cout << "Nom : " << nom << endl;
 		cout << "Type : " << type1 << ", " << type2 << endl;
@@ -64,6 +73,11 @@ public:
 		}
 		cout << "Faiblesse : " << faiblesse << endl;
 	}
+
+	/// <summary>
+	/// Méthode qui vérifie si un pokémon est KO
+	/// </summary>
+	/// <returns>Un booléen indicateur</returns>
 	bool estKo() const {
 		return hp <= 0;
 	}
