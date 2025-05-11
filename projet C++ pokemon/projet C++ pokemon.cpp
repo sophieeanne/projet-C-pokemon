@@ -156,6 +156,10 @@ int main()
 	interface.setJoueurActif(move(ja));
 	interface.Menu();
 
+	//effacer les pointeurs
+	for (auto& pair : pokedex) {
+		delete pair.second;
+	}
 	
 }
 
