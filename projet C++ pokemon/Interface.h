@@ -49,7 +49,8 @@ public :
 
 		do {
 			cout << "Entrez le nom du joueur : ";
-			cin >> nom;
+			cin.ignore();
+			getline(cin, nom);
 			if (joueurExiste(nom, fichier)) {
 				cout << "\"" << nom << "\" est deja pris. Veuillez en choisir un autre." << endl;
 			}
@@ -245,8 +246,9 @@ public :
 	/// <returns>Un pointeur du Joueur</returns>
 	static unique_ptr<Joueur> choisirJoueurActif(const string& fichierJoueurs, const map<string, Pokemon*>& pokedex) {
 		cout << "Saisissez votre pseudo : ";
+		cin.ignore();
 		string pseudo;
-		cin >> pseudo;
+		getline(cin, pseudo);
 
 		vector<Joueur> joueurs = chargerJoueursDepuisFichier(fichierJoueurs, pokedex);
 		for ( auto& joueur : joueurs) {
@@ -952,6 +954,7 @@ public :
 					cout << p2->getNom() << " est KO !" << endl;
 					scoreJoueur++;
 					if (scoreJoueur == 3) break;
+					continue;
 				}
 
 				//adversaire attaque (si son Pokémon n’est pas KO)
@@ -979,6 +982,7 @@ public :
 					cout << p1->getNom() << " est KO !" << endl;
 					scoreLeader++;
 					if (scoreLeader == 3) break;
+					continue;
 				}
 				//joueur attaque (si son Pokémon n’est pas KO)
 				if (!p1->estKo()) {
