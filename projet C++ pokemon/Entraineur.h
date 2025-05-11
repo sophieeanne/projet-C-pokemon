@@ -65,7 +65,7 @@ public :
 				cout << pokemon->getNom() << " a ete soigne !" << endl;
 			}
 			else {
-				cout << pokemon->getNom() << " n a pas besoin de soins." << endl ;
+				cout << pokemon->getNom() << " n'a pas besoin de soins." << endl ;
 			}
 		}
 		cout << "Tous les Pokemon sont en bonne sante !" << endl;
@@ -340,5 +340,7 @@ public :
 	//méthode
 	double appliquerBonus(double degat) {
 		return degat * 2.5;
+	}
+	void ajouterAdversaireVaincu(const string& nomAdversaire) override {
 	}
 };

@@ -91,6 +91,7 @@ int main()
 	cout << "1) Creer un nouvel utilisateur" << endl;
 	cout << "2) Charger un utilisateur existant" << endl;
 
+
 	int choix;
 	bool entreeValide = false;
 
@@ -118,6 +119,24 @@ int main()
 	}
 	else if (choix == 2) {
 		do {
+			//on affiche UNIQUEMENT le nom des joueurs 
+			ifstream fichier(nomFichier);
+			if (!fichier) {
+				cerr << "Erreur lors de l'ouverture du fichier." << endl;
+				return 1;
+			}
+			string ligne;
+			cout << "=== JOUEURS EXISTANTS ===" << endl;
+			getline(fichier, ligne);
+			while (getline(fichier, ligne)) {
+				stringstream ss(ligne);
+				string nom;
+				getline(ss, nom, ',');
+				cout << nom << ", ";
+			}
+			cout << endl;
+			fichier.close();
+
 			ja = Interface::choisirJoueurActif(nomFichier, pokedex);
 			if (!ja) {
 				cout << "Nom de joueur invalide. Veuillez reessayer." << endl;

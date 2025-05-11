@@ -18,6 +18,7 @@ public :
 	unique_ptr<Entraineur> joueurActif;
 	string fichierJoueurs = "joueur.csv";
 	string fichierLeaders = "leaders.csv";
+	string fichierMaitres = "maitres.csv";
 
 	//constructeur par défaut
 	Interface() : joueurActif(nullptr) {}
@@ -435,59 +436,103 @@ public :
 		}
 	}
 
+	//LES METHODES POUR GERER LES MAITRES POKEMON 
+	vector<MaitrePokemon> chargerMaitresDepuisFichier(const string& nomFichier) {
+		vector<MaitrePokemon> maitres;
+		ifstream fichier(nomFichier);
+		if (!fichier.is_open()) {
+			cerr << "Erreur lors de l'ouverture du fichier " << nomFichier << endl;
+			return maitres;
+		}
+
+		string ligne;
+		getline(fichier, ligne);
+
+		while (getline(fichier, ligne)) {
+			stringstream ss(ligne);
+			string champ;
+			vector<string> champs;
+
+			while (getline(ss, champ, ',')) {
+				champs.push_back(champ);
+			}
+
+			if (champs.size() >= 1) {
+				string nomMaitre = champs[0];
+				vector<Pokemon*> equipe;
+				for (size_t i = 3; i < champs.size(); ++i) {
+					if (!champs[i].empty()) {
+						auto it = pokedex.find(champs[i]);
+						if (it != pokedex.end()) {
+							equipe.push_back(it->second);
+						}
+					}
+				}
+
+				MaitrePokemon maitre(nomMaitre, equipe);
+				maitres.push_back(maitre);
+			}
+		}
+
+		fichier.close();
+		return maitres;
+	}
+
 
 
 
 	//LE MENU PRINCIPAL
 	void Menu() {
+		int choix = 0;
+		do {
+			cout << endl;
+			cout << "=== MENU PRINCIPAL ===" << endl;
+			cout << "1) Gerer mon equipe" << endl;
+			cout << "2) Combattre" << endl;
+			cout << "3) Statistiques" << endl;
+			cout << "4) Interagir" << endl;
+			cout << "5) Quitter" << endl;
 
-		cout << endl;
-		cout << "=== MENU PRINCIPAL ===" << endl;
-		cout << "1) Gerer mon equipe" << endl;
-		cout << "2) Combattre" << endl;
-		cout << "3) Statistiques" << endl;
-		cout << "4) Interagir" << endl;
-		cout << "5) Quitter" << endl;
-		int choix;
-		bool entreeValide = false;
+			bool entreeValide = false;
 
+			while (!entreeValide) {
+				try {
+					string saisie;
+					cin >> saisie;
 
-		while (!entreeValide) {
-			try {
-				string saisie;
-				cin >> saisie;
-
-				if (!all_of(saisie.begin(), saisie.end(), ::isdigit)) {
-					throw invalid_argument("Choix invalide, la saisie doit etre un entier.");
+					if (!all_of(saisie.begin(), saisie.end(), ::isdigit)) {
+						throw invalid_argument("Choix invalide, la saisie doit etre un entier.");
+					}
+					choix = stoi(saisie);
+					if (choix < 1 || choix > 5) {
+						throw out_of_range("Choix invalide, la saisie doit etre dans les options proposees.");
+					}
+					entreeValide = true;
 				}
-				choix = stoi(saisie);
-				if (choix < 1 || choix > 5) {
-					throw out_of_range("Choix invalide, la saisie doit etre dans les options proposees.");
+				catch (const exception& e) {
+					cout << e.what() << " Veuillez reessayer." << endl;
 				}
-				entreeValide = true;
 			}
-			catch (const exception& e) {
-				cout << e.what() << " Veuillez reessayer." << endl;
-			}
-		}
 
-		switch (choix) {
-		case 1:
-			GererEquipe();
-			break;
-		case 2:
-			Combattre();
-			break;
-		case 3:
-			Statistiques();
-			break;
-		case 4:
-			Interagir();
-			break;
-		case 5:
-			cout << "Au revoir !" << endl;
-			break;
-		}
+			switch (choix) {
+			case 1:
+				GererEquipe();
+				break;
+			case 2:
+				Combattre();
+				break;
+			case 3:
+				Statistiques();
+				break;
+			case 4:
+				Interagir();
+				break;
+			case 5:
+				cout << "Au revoir !" << endl;
+				break;
+			}
+
+		} while (choix != 5);
 	}
 	
 	//OK !
@@ -544,7 +589,7 @@ public :
 		cout << "=== COMBATTRE ===" << endl;
 		cout << "1) Affronter un joueur" << endl;
 		cout << "2) Defi de gymnase" << endl;
-		cout << "3) Maitre Pokemon (debloque apres 8 badges)" << endl;
+		cout << "3) Maitre Pokemon (debloque apres 3 badges)" << endl;
 		cout << "4) Retour" << endl;
 		int choix;
 		bool entreeValide = false;
@@ -576,6 +621,7 @@ public :
 				AffronterGymnase();
 				break;
 			case 3:
+				AffronterMaitrePokemon();
 				break;
 			case 4:
 				break;
@@ -693,7 +739,6 @@ public :
 					scoreAdversaire++;
 					if (scoreAdversaire == 3) break;
 				}
-
 				//joueur attaque (si son Pokémon n’est pas KO)
 				if (!p1->estKo()) {
 					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
@@ -732,6 +777,7 @@ public :
 
 			updateJoueurDansFichier(*joueur, fichierJoueurs);
 			updateJoueurDansFichier(adversaire, fichierJoueurs);
+
 			//comptabiliser la victoire
 			joueurActif->ajouterAdversaireVaincu(adversaire.getNom());
 		}
@@ -808,6 +854,7 @@ public :
 		int scoreLeader = 0;
 		bool tourDuJoueur = rand() % 2 == 0;
 		int round = 1;
+
 		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
 		while (scoreJoueur < 3 && scoreLeader < 3) {
 			cout << "\n===== ROUND " << round << " =====" << endl;
@@ -875,6 +922,7 @@ public :
 		cout << endl;
 		cout << "=== FIN DU COMBAT ===" << endl;
 		PauseConsole();
+
 		//fin du combat : on affiche les scores et qui a gagné
 		if (scoreJoueur == 3) {
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
@@ -882,21 +930,163 @@ public :
 			cout << joueur->getNom() << " a gagne le combat !" << endl;
 			cout << joueur->getNom() << " : Encore une nouvelle victoire ! " << endl;
 			cout << leader.getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
+
+			//promouvoir le joueur en leader gym
 			promouvoirEnLeaderGym(*joueur, leader.getNom());
+
+			//ajouter le badge au joueur
 			joueur->ajouterCombatGagne();
+			joueur->ajouterBadge(leader.getBadgeGym());
+			updateJoueurDansFichier(*joueur, fichierJoueurs);
+
 			//comptabiliser la victoire
 			joueurActif->ajouterAdversaireVaincu(leader.getNom());
 		}
 		else {
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
 				<< " | " << leader.getNom() << ": " << scoreLeader << endl;
+
 			cout << leader.getNom() << " a gagne le combat !" << endl;
 			cout << leader.getNom() << " : Encore une nouvelle victoire ! " << endl;
 			cout << joueur->getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
+
 			joueur->ajouterCombatPerdu();
 			updateJoueurDansFichier(*joueur, fichierJoueurs);
 		}
 		
+
+	}
+
+	void AffronterMaitrePokemon() {
+		if (!joueurActif) {
+			cout << "Aucun joueur actif !" << endl;
+			return;
+		}
+		int bagesRequis = 3;
+		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
+		if (joueur->getBadges().size() < bagesRequis) {
+			cout << "Vous devez avoir au moins " << bagesRequis << " badges pour affronter le Maitre Pokemon." << endl;
+			return;
+		}
+
+		vector<MaitrePokemon> maitres = chargerMaitresDepuisFichier(fichierMaitres);
+		if (maitres.empty()) {
+			cout << "Aucun Maitre Pokemon disponible." << endl;
+			return;
+		}
+		
+		//on choisi un maitre pokemon au hasard
+		srand(time(0));
+		int index = rand() % maitres.size();
+		MaitrePokemon adversaire = maitres[index];
+		cout << "Vous allez affronter " << adversaire.getNom() << " !" << endl;
+		int scoreJoueur = 0;
+		int scoreAdversaire = 0;
+
+		bool tourDuJoueur = rand() % 2 == 0;
+		int round = 1;
+
+		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
+		while (scoreJoueur < 3 && scoreAdversaire < 3) {
+			cout << "\n===== ROUND " << round << " =====" << endl;
+			Pokemon* p1 = joueur->getPokemonActif();
+			Pokemon* p2 = adversaire.getPokemonActif();
+
+			if (p1 == nullptr || p2 == nullptr) {
+				cout << "Un des joueurs n'a plus de Pokemon utilisables." << endl;
+				break;
+			}
+
+			if (tourDuJoueur) {
+				//joueur attaque
+				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
+				p1->attaquer(*p2);
+				p2->recevoirDegats(p1->calculerDegats(*p2));
+
+				if (p2->estKo()) {
+					cout << p2->getNom() << " est KO !" << endl;
+					scoreJoueur++;
+					if (scoreJoueur == 3) break;
+				}
+
+				//adversaire attaque (si son Pokémon n’est pas KO)
+				if (!p2->estKo()) {
+					cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
+					p2->attaquer(*p1);
+					p1->recevoirDegats(p2->calculerDegats(*p1));
+
+
+					if (p1->estKo()) {
+						cout << p1->getNom() << " est KO !" << endl;
+						scoreAdversaire++;
+						if (scoreAdversaire == 3) break;
+					}
+				}
+			}
+			else {
+				//adversaire commence
+				cout << adversaire.getNom() << " attaque avec " << p2->getNom() << " !" << endl;
+				p2->attaquer(*p1);
+				p1->recevoirDegats(p2->calculerDegats(*p1));
+				if (p1->estKo()) {
+					cout << p1->getNom() << " est KO !" << endl;
+					scoreAdversaire++;
+					if (scoreAdversaire == 3) break;
+				}
+
+				//joueur attaque (si son Pokémon n’est pas KO)
+				if (!p1->estKo()) {
+					cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
+					p1->attaquer(*p2);
+					p2->recevoirDegats(p1->calculerDegats(*p2));
+
+					if (p2->estKo()) {
+						cout << p2->getNom() << " est KO !" << endl;
+						scoreJoueur++;
+						if (scoreJoueur == 3) break;
+					}
+				}
+			}
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << adversaire.getNom() << ": " << scoreAdversaire << endl;
+			PauseConsole();
+			round++;
+			tourDuJoueur = !tourDuJoueur;
+		}
+
+		cout << endl;
+		cout << "=== FIN DU COMBAT ===" << endl;
+		PauseConsole();
+		//fin du combat : on affiche les scores et qui a gagné
+		if (scoreJoueur == 3) {
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << adversaire.getNom() << ": " << scoreAdversaire << endl;
+
+			cout << joueurActif->getNom() << " a gagne le combat !" << endl;
+
+			cout << joueur->getNom() << " : Encore une nouvelle victoire ! " << endl;
+			cout << adversaire.getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
+
+			joueur->ajouterCombatGagne();
+			updateJoueurDansFichier(*joueur, fichierJoueurs);
+			//comptabiliser la victoire
+			joueurActif->ajouterAdversaireVaincu(adversaire.getNom());
+		}
+		else if (scoreAdversaire == 3) {
+			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
+				<< " | " << adversaire.getNom() << ": " << scoreAdversaire << endl;
+			cout << adversaire.getNom() << " a gagne le combat !" << endl;
+
+			cout << adversaire.getNom() << " : Encore une nouvelle victoire ! " << endl;
+			cout << joueur->getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
+
+			joueur->ajouterCombatPerdu();
+			updateJoueurDansFichier(*joueur, fichierJoueurs);
+		}
+		else {
+			cout << "Le combat est terminé." << endl;
+		}
+
 
 	}
 
@@ -910,8 +1100,6 @@ public :
 			cout << "Aucun joueur actif !" << endl;
 		}
 	}
-
-
 
 	void Interagir() {
 		Joueur* joueur = dynamic_cast<Joueur*>(joueurActif.get());
@@ -952,7 +1140,6 @@ public :
 
 
 	}
-
 
 	//OK !
 	void PauseConsole() {
