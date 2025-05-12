@@ -6,7 +6,7 @@ class PokemonFeu : public Pokemon
 public:
 	//Constructeur
 	PokemonFeu(string Nom, int Hp, string nomAttaque, int Degat, string Faiblesse)
-		: Pokemon(Nom,"Feu", "", Hp, nomAttaque, Degat) {
+		: Pokemon(Nom,"Feu", "", Hp, nomAttaque, Degat, Faiblesse) {
 	}
 
 	//Méthodes virtuelles pures

@@ -26,6 +26,9 @@ public:
 	Pokemon(string Nom, string t1, string t2, int Hp, string nomAttaque, int Degat) : nom(Nom), type1(t1), type2(t2), hp(Hp), hpMax(Hp){
 		attaques[nomAttaque] = Degat;
 	}
+	Pokemon(string Nom, string t1, string t2, int Hp, string nomAttaque, int Degat, string Faiblesse) : nom(Nom), type1(t1), type2(t2), hp(Hp), hpMax(Hp), faiblesse(Faiblesse) {
+		attaques[nomAttaque] = Degat;
+	}
 
 	//setters
 	void setNom(string Nom) { nom = Nom; }
@@ -77,6 +80,7 @@ public:
 			cout << "- " << attaque.first << " : " << attaque.second << " puissance" << endl;
 		}
 		cout << "Faiblesse : " << faiblesse << endl;
+		cout << endl;
 	}
 
 	/// <summary>
