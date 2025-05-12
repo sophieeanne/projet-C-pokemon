@@ -49,7 +49,7 @@ public:
 		}
 		
 		cout << " et inflige " << degats << " degats ! " << endl;
-		cible.recevoirDegats(degats);
+		//cible.recevoirDegats(degats);
 	}
 
 	/// <summary>

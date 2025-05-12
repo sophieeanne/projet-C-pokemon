@@ -269,7 +269,7 @@ public:
 	void ajouterAdversaireVaincu(const string& nomAdversaire) override{
 		if (find(adversairesVaincus.begin(), adversairesVaincus.end(), nomAdversaire) == adversairesVaincus.end()) {
 			adversairesVaincus.push_back(nomAdversaire);
-			cout << nomAdversaire << " ajoute a la liste des adversaires vaincus de " << nom << endl;
+			/*cout << nomAdversaire << " ajoute a la liste des adversaires vaincus de " << nom << endl;*/
 		}
 	}
 
@@ -465,7 +465,7 @@ public :
 	/// <param name="degat">Le degat fait</param>
 	/// <returns>Le nouveau degat avec le bonus</returns>
 	double appliquerBonus(double degat) {
-		return degat = degat * 1.25;
+		return degat * 1.25;
 	}
 
 	/// <summary>

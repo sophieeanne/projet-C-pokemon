@@ -66,7 +66,12 @@ public:
 	void afficherInfos() {
 		cout << "Nom : " << nom << endl;
 		cout << "Type : " << type1 << ", " << type2 << endl;
-		cout << "Hp : " << hp << endl;
+		if (hp < 0) {
+			cout << "Hp : " << 0 << endl;
+		}
+		else {
+			cout << "Hp : " << hp << endl;
+		}
 		cout << "Attaques : " << endl;
 		for (const auto& attaque : attaques) {
 			cout << "- " << attaque.first << " : " << attaque.second << " puissance" << endl;
