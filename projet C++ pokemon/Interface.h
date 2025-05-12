@@ -349,7 +349,7 @@ public :
 	/// <param name="joueur">L'objet joueur qui a vaincu</param>
 	/// <param name="leaderBattu">Le nom du leader battu</param>
 	/// <returns>Le joueur devenu leader</returns>
-	LeaderGym promouvoirEnLeaderGym(Joueur& joueur, const string& leaderBattu) {
+	LeaderGym promouvoirEnLeaderGym(Joueur& joueur, LeaderGym& leaderBattu) {
 		map<string, int> typeCounts;
 
 		//on compte le type de pokemon le plus présent dans l'équipe
@@ -410,9 +410,9 @@ public :
 				champs.push_back(champ);
 			}
 
-			if (!champs.empty() && champs[0] == leaderBattu) {
+			if (!champs.empty() && champs[0] == leaderBattu.getNom()) {
 				// Si on trouve le leader battu, on remplace la ligne par le nouveau leader
-				string nouvelleLigne = leader.getNom() + "," + leader.getNomGym() + "," + leader.getBadgeGym();
+				string nouvelleLigne = leader.getNom() + "," + leaderBattu.getNomGym() + "," + leaderBattu.getBadgeGym();
 				for (auto* p : leader.getEquipe()) {
 					nouvelleLigne += "," + (p ? p->getNom() : "");
 				}
@@ -425,7 +425,7 @@ public :
 		}
 		fichier.close();
 		if (!leaderBattuTrouve) {
-			cerr << "Leader battu non trouvé : " << leaderBattu << endl;
+			cerr << "Leader battu non trouvé : " << leaderBattu.getNom() << endl;
 			return leader;
 		}
 		ofstream outFile("leaders.csv");
@@ -439,7 +439,7 @@ public :
 
 		outFile.close();
 
-		cout << joueur.getNom() << " a ete promu Leader de " << gym << " avec le badge " << badge << " !" << endl;
+		cout << joueur.getNom() << " a ete promu Leader de " << leaderBattu.getNomGym() << " avec le badge " << leaderBattu.getBadgeGym() << " !" << endl;
 		return leader;
 	}
 
@@ -724,7 +724,8 @@ public :
 
 		do {
 			cout << "Quel joueur voulez-vous affronter ? ";
-			cin >> nomAdversaire;
+			cin.ignore();
+			getline(cin, nomAdversaire);
 
 			for (const string& nom : nomsJoueurs) {
 				if (nom == nomAdversaire) {
@@ -754,7 +755,7 @@ public :
 		int scoreJoueur = 0;
 		int scoreAdversaire = 0;
 
-		bool tourDuJoueur = rand() % 2 == 0;
+		bool tourDuJoueur = true;
 		int round = 1;
 
 		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
@@ -805,6 +806,7 @@ public :
 				if (p1->estKo()) {
 					cout << p1->getNom() << " est KO !" << endl;
 					scoreAdversaire++;
+					tourDuJoueur = !tourDuJoueur;
 					if (scoreAdversaire == 3) break;
 				}
 				//joueur attaque (si son Pokémon n’est pas KO)
@@ -905,7 +907,8 @@ public :
 		bool leaderTrouve = false;
 		do {
 			cout << "Quel leader voulez-vous affronter ? ";
-			cin >> nomLeader;
+			cin.ignore();
+			getline(cin, nomLeader);
 
 			for (const string& nom : nomLeaders) {
 				if (nom == nomLeader) {
@@ -929,7 +932,7 @@ public :
 		}
 		int scoreJoueur = 0;
 		int scoreLeader = 0;
-		bool tourDuJoueur = rand() % 2 == 0;
+		bool tourDuJoueur = true;
 		int round = 1;
 
 		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
@@ -954,7 +957,6 @@ public :
 					cout << p2->getNom() << " est KO !" << endl;
 					scoreJoueur++;
 					if (scoreJoueur == 3) break;
-					continue;
 				}
 
 				//adversaire attaque (si son Pokémon n’est pas KO)
@@ -982,7 +984,6 @@ public :
 					cout << p1->getNom() << " est KO !" << endl;
 					scoreLeader++;
 					if (scoreLeader == 3) break;
-					continue;
 				}
 				//joueur attaque (si son Pokémon n’est pas KO)
 				if (!p1->estKo()) {
@@ -1001,6 +1002,8 @@ public :
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
 				<< " | " << leader.getNom() << ": " << scoreLeader << endl;
 			PauseConsole();
+			round++;
+			tourDuJoueur = !tourDuJoueur;
 		}
 		cout << endl;
 		cout << "=== FIN DU COMBAT ===" << endl;
@@ -1015,7 +1018,7 @@ public :
 			cout << leader.getNom() << " : Je vais m'entrainer pour la prochaine fois !" << endl;
 
 			//promouvoir le joueur en leader gym
-			promouvoirEnLeaderGym(*joueur, leader.getNom());
+			promouvoirEnLeaderGym(*joueur, leader);
 
 			//ajouter le badge au joueur
 			joueur->ajouterCombatGagne();
@@ -1071,7 +1074,7 @@ public :
 		int scoreJoueur = 0;
 		int scoreAdversaire = 0;
 
-		bool tourDuJoueur = rand() % 2 == 0;
+		bool tourDuJoueur = true;
 		int round = 1;
 
 		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO

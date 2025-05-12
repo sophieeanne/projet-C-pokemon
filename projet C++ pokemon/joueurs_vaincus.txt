@@ -1,6 +1,6 @@
 labubu,Sacha,Regis
 laura,Lolo,labubu
-test,Sacha
-anne so,Sacha
+test,Sacha,anne so
+anne so,Sacha,Flora,Aqua
 AnneSophie,anne so
 Lolo,Sacha
