@@ -1,4 +1,4 @@
-labubu,Sacha,Regis,test,Aqua,labubu
+labubu,Sacha,test,Aqua
 laura,Lolo,labubu
 test,Sacha,anne so
 anne so,Sacha,Flora,Aqua
