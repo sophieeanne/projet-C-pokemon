@@ -778,7 +778,7 @@ public :
 		bool tourDuJoueur = true;
 		int round = 1;
 
-		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
+		//boucle de combat : on continue jusqu'à qu'un joueur a mit 6 des pokémons de son adversaire KO
 		while (joueur->getPokemonActif() != nullptr && adversaire.getPokemonActif() != nullptr) {
 			cout << "\n===== ROUND " << round << " =====" << endl;
 			Pokemon* p1 = joueur->getPokemonActif();
@@ -828,6 +828,7 @@ public :
 						cout << p1->getNom() << " est KO !" << endl;
 						scoreAdversaire++;
 					}
+					tourDuJoueur = !tourDuJoueur;
 				}
 			}
 			else {
@@ -860,6 +861,7 @@ public :
 						cout << p2->getNom() << " est KO !" << endl;
 						scoreJoueur++;
 					}
+					tourDuJoueur = !tourDuJoueur;
 				}
 			}
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
@@ -982,7 +984,7 @@ public :
 		bool tourDuJoueur = true;
 		int round = 1;
 
-		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
+		//boucle de combat : on continue jusqu'à qu'un joueur a mit 6 des pokémons de son adversaire KO
 		while (joueur->getPokemonActif() != nullptr && leader.getPokemonActif() != nullptr) {
 			cout << "\n===== ROUND " << round << " =====" << endl;
 			Pokemon* p1 = joueur->getPokemonActif();
@@ -1030,6 +1032,7 @@ public :
 						cout << p1->getNom() << " est KO !" << endl;
 						scoreLeader++;
 					}
+					tourDuJoueur = !tourDuJoueur;
 				}
 			}
 			else {
@@ -1061,6 +1064,7 @@ public :
 						cout << p2->getNom() << " est KO !" << endl;
 						scoreJoueur++;
 					}
+					tourDuJoueur = !tourDuJoueur;
 				}
 			}
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
@@ -1142,7 +1146,7 @@ public :
 		bool tourDuJoueur = true;
 		int round = 1;
 
-		//boucle de combat : on continue jusqu'à qu'un joueur a mit 3 des pokémons de son adversaire KO
+		//boucle de combat : on continue jusqu'à qu'un joueur a mit 6 des pokémons de son adversaire KO
 		while (joueur->getPokemonActif() != nullptr && adversaire.getPokemonActif() != nullptr ) {
 			cout << "\n===== ROUND " << round << " =====" << endl;
 			Pokemon* p1 = joueur->getPokemonActif();
@@ -1160,11 +1164,14 @@ public :
 			cout << p2->getNom() << " (" << p2->getHp() << " HP restants)" << endl;
 			cout << endl;
 
+			bool adversaireAjoue = false;
+
 			if (tourDuJoueur) {
 				//joueur attaque
 				cout << joueur->getNom() << " attaque avec " << p1->getNom() << " !" << endl;
 				p1->attaquer(*p2);
 				p2->recevoirDegats(p1->calculerDegats(*p2));
+
 				this_thread::sleep_for(chrono::seconds(3));
 
 				if (p2->estKo()) {
@@ -1202,7 +1209,9 @@ public :
 						cout << p1->getNom() << " est KO !" << endl;
 						scoreAdversaire++;
 					}
+					tourDuJoueur = !tourDuJoueur;
 				}
+				
 			}
 			else {
 				//adversaire commence
@@ -1245,7 +1254,9 @@ public :
 						cout << p2->getNom() << " est KO !" << endl;
 						scoreJoueur++;
 					}
+					tourDuJoueur = !tourDuJoueur;
 				}
+				
 			}
 			cout << "Score - " << joueur->getNom() << ": " << scoreJoueur
 				<< " | " << adversaire.getNom() << ": " << scoreAdversaire << endl;
